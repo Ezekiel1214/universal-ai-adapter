@@ -9,3 +9,8 @@ coverage/
 *.swp
 *.swo
 .npmrc
+
+
+
+.nx/cache
+.nx/workspace-data
