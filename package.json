@@ -1,0 +1,55 @@
+{
+  "name": "universal-ai-adapter",
+  "version": "1.0.0",
+  "description": "Universal adapter for multiple AI providers with automatic fallback",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "openai",
+    "anthropic",
+    "ollama",
+    "groq",
+    "deepseek",
+    "adapter",
+    "universal"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^4.20.0",
+    "@anthropic-ai/sdk": "^0.27.0",
+    "axios": "^1.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.10.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.50.0"
+  },
+  "peerDependencies": {
+    "openai": "^4.20.0",
+    "@anthropic-ai/sdk": "^0.27.0",
+    "axios": "^1.7.0"
+  },
+  "peerDependenciesMeta": {
+    "openai": {
+      "optional": true
+    },
+    "@anthropic-ai/sdk": {
+      "optional": true
+    }
+  }
+}
