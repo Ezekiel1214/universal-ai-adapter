@@ -1,5 +1,5 @@
 import express from 'express';
-import { UniversalAIAdapter } from './src/index.js';
+import { UniversalAIAdapter } from './dist/index.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
