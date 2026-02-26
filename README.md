@@ -4,6 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/universal-ai-adapter.svg)](https://www.npmjs.com/package/universal-ai-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Test Status](https://img.shields.io/badge/tests-39%20passed-brightgreen)](https://github.com/anomalyco/universal-ai-adapter)
 
 ## Features
 
@@ -14,20 +15,21 @@
 ✅ **Rate Limiting** - Per-provider rate limit management  
 ✅ **Retry Logic** - Exponential backoff with jitter  
 ✅ **Circuit Breaker** - Prevent cascading failures  
-✅ **Streaming Support** - Stream management utilities  
+✅ **Streaming Support** - Real-time response streaming  
+✅ **Model Router** - Intelligent provider selection  
 ✅ **Zero Config** - Works with environment variables  
 ✅ **Local-First** - Free Ollama support out of the box  
 ✅ **Tool Calling** - Function calling support where available
 
 ## Supported Providers
 
-| Provider | Status | Tool Calling | Free Tier |
-|----------|--------|--------------|-----------|
-| **Ollama** | ✅ | ❌ | ✅ Free (Local) |
-| **OpenAI** | ✅ | ✅ | ❌ Paid |
-| **Anthropic** | ✅ | ✅ | ❌ Paid |
-| **Groq** | ✅ | ✅ | ✅ Free Tier |
-| **DeepSeek** | ✅ | ✅ | ✅ Budget |
+| Provider | Status | Streaming | Tool Calling | Free Tier |
+|----------|--------|-----------|--------------|-----------|
+| **Ollama** | ✅ | ❌ | ❌ | ✅ Free (Local) |
+| **OpenAI** | ✅ | ✅ | ✅ | ❌ Paid |
+| **Anthropic** | ✅ | ✅ | ✅ | ❌ Paid |
+| **Groq** | ✅ | ✅ | ✅ | ✅ Free Tier |
+| **DeepSeek** | ✅ | ✅ | ✅ | ✅ Budget |
 
 ## Installation
 
@@ -178,6 +180,26 @@ if (response.toolCalls && response.toolCalls.length > 0) {
   console.log('Function:', toolCall.function.name);
   console.log('Arguments:', JSON.parse(toolCall.function.arguments));
   // { location: "London" }
+}
+```
+
+### 5. With Streaming
+
+```typescript
+const adapter = new UniversalAIAdapter({
+  provider: 'openai',
+  providers: {
+    openai: { apiKey: process.env.OPENAI_API_KEY }
+  }
+});
+
+// Check if streaming is supported
+if (adapter.supportsStreaming()) {
+  for await (const chunk of adapter.stream({
+    messages: [{ role: 'user', content: 'Count to 5' }]
+  })) {
+    process.stdout.write(chunk.content);
+  }
 }
 ```
 

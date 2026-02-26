@@ -1,8 +1,46 @@
+# Source
 src/
 tsconfig.json
+tsconfig.test.json
+
+# Git
+.git/
 .gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.vs/
+.idea/
+*.swp
+*.swo
+
+# Testing
 *.test.ts
 *.test.js
 coverage/
-.vscode/
-.idea/
+jest.config.js
+
+# CI/CD
+.github/
+
+# AI Agent configs
+.claude/
+.codex/
+.cursor/
+.gemini/
+.opencode/
+
+# Node
+node_modules/
+.npmrc
+
+# Build
+*.log
+dist/
+
+# Misc
+.env
+.env.example
+*.md
+!README.md

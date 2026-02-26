@@ -123,7 +123,9 @@ export class StreamAggregator {
       (tc): tc is ToolCall => 
         tc.id !== undefined && 
         tc.type !== undefined && 
-        tc.function !== undefined
+        tc.function !== undefined &&
+        tc.function.name !== undefined &&
+        tc.function.arguments !== undefined
     );
   }
 

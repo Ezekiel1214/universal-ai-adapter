@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { BaseProvider } from './base.js';
 import { ChatRequest, ChatResponse, AIAdapterError } from '../types.js';
+import { StreamChunk } from '../streaming.js';
 
 export class AnthropicProvider implements BaseProvider {
   readonly name = 'anthropic';
@@ -16,9 +17,12 @@ export class AnthropicProvider implements BaseProvider {
     this.model = model || 'claude-3-5-sonnet-20241022';
   }
 
+  supportsStreaming(): boolean {
+    return true;
+  }
+
   async isAvailable(): Promise<boolean> {
     try {
-      // Anthropic doesn't have a simple health check, so we'll assume it's available if client is initialized
       return !!this.client;
     } catch {
       return false;
@@ -31,6 +35,40 @@ export class AnthropicProvider implements BaseProvider {
 
   getModel(): string {
     return this.model;
+  }
+
+  async* stream(request: ChatRequest): AsyncGenerator<StreamChunk, void, unknown> {
+    const systemMessage = request.messages.find(m => m.role === 'system');
+    const userMessages = request.messages.filter(m => m.role !== 'system');
+
+    const stream = await this.client.messages.stream({
+      model: this.model,
+      max_tokens: request.maxTokens || 4096,
+      system: systemMessage?.content,
+      messages: userMessages.map(m => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: m.content
+      })),
+      temperature: request.temperature ?? 0.7
+    });
+
+    for await (const chunk of stream) {
+      if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+        yield {
+          content: chunk.delta.text || undefined,
+          done: false,
+          provider: 'anthropic',
+          model: this.model
+        };
+      } else if (chunk.type === 'message_delta') {
+        yield {
+          content: undefined,
+          done: true,
+          provider: 'anthropic',
+          model: this.model
+        };
+      }
+    }
   }
 
   async chat(request: ChatRequest): Promise<ChatResponse> {
