@@ -3,7 +3,9 @@ import { BaseProvider } from './base.js';
 import { ChatRequest, ChatResponse, AIAdapterError } from '../types.js';
 
 export class OllamaProvider implements BaseProvider {
-  readonly name = 'ollama';
+  get name() {
+    return 'ollama' as const;
+  }
   private client: AxiosInstance;
   private model: string;
   private baseURL: string;

@@ -1,7 +1,7 @@
 import { UniversalAIAdapter } from './adapter.js';
 import { ResponseCache, CacheConfig, CachePresets } from './cache.js';
 import { RateLimiter, RetryHandler, CircuitBreaker, RateLimitConfig, RetryConfig } from './rate-limit.js';
-import { MetricsCollector, RequestMetrics, generateDashboard, DashboardData } from './metrics.js';
+import { MetricsCollector, generateDashboard, DashboardData } from './metrics.js';
 import { AIProvider, Message, ChatRequest, ChatResponse, UniversalAIConfig } from './types.js';
 
 /**
@@ -193,7 +193,6 @@ export class SmartAdapter {
     const providerInfo = this.adapter.getCurrentProvider();
     const provider = providerInfo.provider;
     let retryCount = 0;
-    let cached = false;
 
     try {
       // 1. Check circuit breaker
@@ -212,7 +211,6 @@ export class SmartAdapter {
         );
 
         if (cachedResponse) {
-          cached = true;
           const duration = Date.now() - startTime;
 
           // Record metrics for cached response

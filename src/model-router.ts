@@ -40,7 +40,9 @@ export interface ModelProfile {
     math: number;
     reasoning: number;
     creative: number;
+    chat: number;
     translation: number;
+    summarization: number;
   };
   
   // Performance characteristics
@@ -123,7 +125,7 @@ export class ModelRouter {
         quality: 0.3,
         capability: 0.1
       },
-      customScoreFn: config.customScoreFn,
+      customScoreFn: config.customScoreFn || ((profile: ModelProfile, _context: RouterContext) => profile.performance.quality),
       fallbackProvider: config.fallbackProvider || 'ollama',
       verbose: config.verbose || false
     };
@@ -144,9 +146,11 @@ export class ModelRouter {
         coding: 0.95,
         writing: 0.95,
         analysis: 0.95,
+        chat: 0.95,
         math: 0.90,
         reasoning: 0.95,
         creative: 0.90,
+        summarization: 0.90,
         translation: 0.85
       },
       performance: {
@@ -166,9 +170,11 @@ export class ModelRouter {
         coding: 0.75,
         writing: 0.80,
         analysis: 0.75,
+        chat: 0.80,
         math: 0.70,
         reasoning: 0.75,
         creative: 0.75,
+        summarization: 0.75,
         translation: 0.80
       },
       performance: {
@@ -188,9 +194,11 @@ export class ModelRouter {
         coding: 0.98,
         writing: 0.95,
         analysis: 0.95,
+        chat: 0.95,
         math: 0.85,
         reasoning: 0.95,
         creative: 0.92,
+        summarization: 0.93,
         translation: 0.90
       },
       performance: {
@@ -210,9 +218,11 @@ export class ModelRouter {
         coding: 0.85,
         writing: 0.85,
         analysis: 0.80,
+        chat: 0.82,
         math: 0.75,
         reasoning: 0.80,
         creative: 0.80,
+        summarization: 0.78,
         translation: 0.75
       },
       performance: {
@@ -232,9 +242,11 @@ export class ModelRouter {
         coding: 0.90,
         writing: 0.80,
         analysis: 0.85,
+        chat: 0.88,
         math: 0.85,
         reasoning: 0.85,
         creative: 0.75,
+        summarization: 0.80,
         translation: 0.70
       },
       performance: {
@@ -254,9 +266,11 @@ export class ModelRouter {
         coding: 0.70,
         writing: 0.75,
         analysis: 0.70,
+        chat: 0.72,
         math: 0.65,
         reasoning: 0.70,
         creative: 0.70,
+        summarization: 0.68,
         translation: 0.65
       },
       performance: {

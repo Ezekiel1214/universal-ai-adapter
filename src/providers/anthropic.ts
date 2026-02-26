@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { BaseProvider } from './base.js';
-import { ChatRequest, ChatResponse, AIAdapterError, Message } from '../types.js';
+import { ChatRequest, ChatResponse, AIAdapterError } from '../types.js';
 
 export class AnthropicProvider implements BaseProvider {
   readonly name = 'anthropic';

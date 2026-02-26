@@ -1,5 +1,6 @@
 import { UniversalAIAdapter } from '../adapter';
 import { AIAdapterError } from '../types';
+import { jest } from '@jest/globals';
 
 describe('UniversalAIAdapter', () => {
   describe('Constructor', () => {
@@ -181,7 +182,7 @@ describe('UniversalAIAdapter', () => {
 
   describe('Verbose Mode', () => {
     it('should enable verbose logging', () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
       
       const adapter = new UniversalAIAdapter({
         provider: 'ollama',
