@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Universal AI Adapter - One app for all AI providers. Free local AI with Ollama, or connect to OpenAI, Anthropic, Groq, DeepSeek.">
+  <meta name="theme-color" content="#6366f1">
   <title>Universal AI Adapter - Download</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-primary: #0a0a0f;
@@ -20,9 +22,7 @@
       --border-color: #2a2a3a;
       --success: #22c55e;
       --warning: #f59e0b;
-      --android: #3ddc84;
-      --windows: #0078d4;
-      --apple: #fff;
+      --gradient: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #a78bfa 100%);
     }
 
     * {
@@ -35,166 +35,129 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
+      line-height: 1.6;
     }
 
-    .hero {
-      min-height: 100vh;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    nav {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 40px 20px;
-      background: 
-        radial-gradient(ellipse at top, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at bottom right, rgba(129, 140, 248, 0.1) 0%, transparent 50%),
-        var(--bg-primary);
+      justify-content: space-between;
+      height: 70px;
     }
 
     .logo {
-      width: 100px;
-      height: 100px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 20px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 50px;
-      margin-bottom: 32px;
-      box-shadow: 0 20px 60px var(--accent-glow);
-      animation: float 3s ease-in-out infinite;
+      font-size: 20px;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
     }
 
-    h1 {
-      font-size: 48px;
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 160px 0 100px;
+      text-align: center;
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.3) 0%, transparent 60%),
+        var(--bg-primary);
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 8vw, 72px);
       font-weight: 800;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
       background: linear-gradient(135deg, #fff 0%, var(--accent-secondary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      line-height: 1.1;
     }
 
-    .tagline {
-      font-size: 20px;
+    .hero p {
+      font-size: clamp(16px, 2vw, 20px);
       color: var(--text-secondary);
       max-width: 600px;
-      margin-bottom: 48px;
-      line-height: 1.6;
+      margin: 0 auto 48px;
     }
 
-    .platforms {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      max-width: 1000px;
-      width: 100%;
-      margin-bottom: 48px;
-    }
-
-    .platform-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 32px;
-      text-align: left;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .platform-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .platform-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-primary);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .platform-card:hover::before {
-      opacity: 1;
-    }
-
-    .platform-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 16px;
+    .hero-btns {
       display: flex;
-      align-items: center;
+      gap: 16px;
       justify-content: center;
-      font-size: 30px;
-      margin-bottom: 20px;
-    }
-
-    .platform-card.windows .platform-icon {
-      background: rgba(0, 120, 212, 0.2);
-    }
-
-    .platform-card.android .platform-icon {
-      background: rgba(61, 220, 132, 0.2);
-    }
-
-    .platform-card.web .platform-icon {
-      background: rgba(99, 102, 241, 0.2);
-    }
-
-    .platform-card.npm .platform-icon {
-      background: rgba(231, 76, 60, 0.2);
-    }
-
-    .platform-card h3 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    .platform-card p {
-      color: var(--text-secondary);
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 24px;
+      flex-wrap: wrap;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 14px 28px;
-      border-radius: 12px;
+      gap: 10px;
+      padding: 16px 32px;
+      border-radius: 14px;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 16px;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
       border: none;
       cursor: pointer;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      background: var(--gradient);
       color: white;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      box-shadow: 0 4px 30px var(--accent-glow);
     }
 
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px var(--accent-glow);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px var(--accent-glow);
     }
 
     .btn-secondary {
@@ -208,147 +171,368 @@
       border-color: var(--accent-primary);
     }
 
-    .features {
+    /* Platforms */
+    .platforms {
+      padding: 80px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 48px;
+    }
+
+    .platforms-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      max-width: 800px;
-      margin-top: 60px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .platform-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 40px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .platform-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .platform-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent-primary);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .platform-card:hover::before {
+      opacity: 1;
+    }
+
+    .platform-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 24px;
+    }
+
+    .platform-card.windows .platform-icon { background: rgba(0, 120, 212, 0.2); }
+    .platform-card.android .platform-icon { background: rgba(61, 220, 132, 0.2); }
+    .platform-card.web .platform-icon { background: rgba(99, 102, 241, 0.2); }
+    .platform-card.npm .platform-icon { background: rgba(231, 76, 60, 0.2); }
+    .platform-card.github .platform-icon { background: rgba(255, 255, 255, 0.1); }
+
+    .platform-card h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .platform-card p {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      min-height: 60px;
+    }
+
+    .platform-card .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 12px;
+    }
+
+    .badge-free { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+    .badge-new { background: rgba(99, 102, 241, 0.2); color: var(--accent-secondary); }
+    .badge-soon { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+
+    /* Features */
+    .features {
+      padding: 80px 0;
+      background: var(--bg-secondary);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
     }
 
     .feature {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 24px;
       background: var(--bg-tertiary);
-      border-radius: 12px;
-      font-size: 14px;
+      border-radius: 16px;
     }
 
     .feature-icon {
-      width: 32px;
-      height: 32px;
+      width: 48px;
+      height: 48px;
       background: rgba(99, 102, 241, 0.2);
-      border-radius: 8px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
     }
 
-    .coming-soon {
-      background: var(--warning);
-      color: #000;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
+    .feature h4 {
+      font-size: 16px;
       font-weight: 600;
+      margin-bottom: 6px;
     }
 
-    .version {
-      margin-top: 60px;
-      color: var(--text-muted);
+    .feature p {
       font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* Code Preview */
+    .code-section {
+      padding: 80px 0;
+    }
+
+    .code-block {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px;
+      text-align: left;
+      overflow-x: auto;
+    }
+
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+
+    .code-keyword { color: #c792ea; }
+    .code-string { color: #c3e88d; }
+    .code-function { color: #82aaff; }
+    .code-comment { color: #546e7a; }
+
+    /* Footer */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--accent-secondary);
+      text-decoration: none;
     }
 
     @media (max-width: 768px) {
-      h1 {
-        font-size: 32px;
-      }
-      .tagline {
-        font-size: 16px;
-      }
-      .platforms {
-        grid-template-columns: 1fr;
-      }
+      .nav-links { display: none; }
+      .hero { padding: 120px 0 60px; }
+      .platforms-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="hero">
-    <div class="logo">🤖</div>
-    
-    <h1>Universal AI Adapter</h1>
-    <p class="tagline">
-      A unified interface for all AI providers. One app, every AI model. 
-      Free local AI with Ollama, or connect to OpenAI, Anthropic, Groq, and DeepSeek.
-    </p>
-
-    <div class="platforms">
-      <!-- Windows -->
-      <div class="platform-card windows">
-        <div class="platform-icon">🪟</div>
-        <h3>Windows</h3>
-        <p>Standalone executable for Windows. No installation required - just download and run.</p>
-        <a href="./downloads/universal-ai-adapter.exe" class="btn btn-primary" download>
-          ⬇️ Download .exe
+  <header>
+    <div class="container">
+      <nav>
+        <a href="/" class="logo">
+          <div class="logo-icon">🤖</div>
+          <span>Universal AI Adapter</span>
         </a>
-      </div>
+        <ul class="nav-links">
+          <li><a href="#downloads">Downloads</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#code">Code</a></li>
+          <li><a href="https://github.com/anomalyco/universal-ai-adapter">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-      <!-- Android -->
-      <div class="platform-card android">
-        <div class="platform-icon">📱</div>
-        <h3>Android</h3>
-        <p>Install as a web app or download the APK for offline use. Works with all Android devices.</p>
-        <span class="coming-soon">Coming Soon</span>
-      <!--
-        <a href="./downloads/universal-ai-adapter.apk" class="btn btn-primary" download>
-          ⬇️ Download APK
-        </a>
-      -->
-      </div>
-
-      <!-- Web -->
-      <div class="platform-card web">
-        <div class="platform-icon">🌐</div>
-        <h3>Web App</h3>
-        <p>Use the web interface in any browser. Works on all devices with a modern browser.</p>
-        <a href="http://localhost:3001" target="_blank" class="btn btn-secondary">
-          🌐 Open Web App
-        </a>
-      </div>
-
-      <!-- NPM -->
-      <div class="platform-card npm">
-        <div class="platform-icon">📦</div>
-        <h3>NPM Package</h3>
-        <p>Install as a Node.js library. Perfect for developers building AI-powered apps.</p>
-        <a href="https://npmjs.com/package/universal-ai-adapter" target="_blank" class="btn btn-secondary">
-          📦 View on NPM
-        </a>
+  <section class="hero">
+    <div class="container">
+      <h1>One App for<br>Every AI Model</h1>
+      <p>Unified interface for OpenAI, Anthropic, Groq, DeepSeek, and free local AI with Ollama. Built for developers and power users.</p>
+      <div class="hero-btns">
+        <a href="#downloads" class="btn btn-primary">⬇️ Download Now</a>
+        <a href="http://localhost:3001" target="_blank" class="btn btn-secondary">🌐 Try Web App</a>
       </div>
     </div>
+  </section>
 
-    <div class="features">
-      <div class="feature">
-        <div class="feature-icon">✅</div>
-        <span>5 AI Providers</span>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🔄</div>
-        <span>Auto Fallback</span>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">💾</div>
-        <span>Response Caching</span>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">⚡</div>
-        <span>Rate Limiting</span>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🔁</div>
-        <span>Retry Logic</span>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🔌</div>
-        <span>Circuit Breaker</span>
+  <section class="platforms" id="downloads">
+    <div class="container">
+      <h2 class="section-title">Choose Your Platform</h2>
+      <div class="platforms-grid">
+        
+        <div class="platform-card windows">
+          <div class="platform-icon">🪟</div>
+          <h3>Windows</h3>
+          <p>Standalone executable. No installation needed - just download and run. Includes CLI and server.</p>
+          <a href="./universal-ai-adapter.exe" download class="btn btn-primary">⬇️ Download .exe</a>
+        </div>
+
+        <div class="platform-card android">
+          <div class="platform-icon">📱</div>
+          <h3>Android <span class="badge badge-soon">Coming Soon</span></h3>
+          <p>Web App (PWA) - Works in any browser. Add to home screen for full-screen experience.</p>
+          <a href="http://localhost:3001" target="_blank" class="btn btn-secondary">🌐 Open Web App</a>
+        </div>
+
+        <div class="platform-card web">
+          <div class="platform-icon">🌐</div>
+          <h3>Web <span class="badge badge-free">Free</span></h3>
+          <p>Use instantly in your browser. No download required. Works on all devices.</p>
+          <a href="http://localhost:3001" target="_blank" class="btn btn-secondary">🚀 Open Web App</a>
+        </div>
+
+        <div class="platform-card npm">
+          <div class="platform-icon">📦</div>
+          <h3>NPM Package</h3>
+          <p>Install as a Node.js library. Perfect for building AI-powered applications.</p>
+          <a href="https://npmjs.com/package/universal-ai-adapter" target="_blank" class="btn btn-secondary">📦 View on NPM</a>
+        </div>
+
+        <div class="platform-card github">
+          <div class="platform-icon">💻</div>
+          <h3>Source Code</h3>
+          <p>Open source on GitHub. Contribute, fork, or build from source.</p>
+          <a href="https://github.com/anomalyco/universal-ai-adapter" target="_blank" class="btn btn-secondary">⭐ View on GitHub</a>
+        </div>
+
       </div>
     </div>
+  </section>
 
-    <div class="version">
-      Version 1.2.0 | MIT License
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Powerful Features</h2>
+      <div class="features-grid">
+        
+        <div class="feature">
+          <div class="feature-icon">🔄</div>
+          <div>
+            <h4>Auto Fallback</h4>
+            <p>Automatically switch providers when one fails. Never lose your chat.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">💾</div>
+          <div>
+            <h4>Response Caching</h4>
+            <p>Intelligent caching with LRU eviction. Save API calls and money.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <div>
+            <h4>Rate Limiting</h4>
+            <p>Built-in rate limiting per provider. Avoid hitting API limits.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">🔁</div>
+          <div>
+            <h4>Retry Logic</h4>
+            <p>Exponential backoff with jitter. Handles transient failures.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">🔌</div>
+          <div>
+            <h4>Circuit Breaker</h4>
+            <p>Prevent cascading failures. Auto-recovery when services recover.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">📡</div>
+          <div>
+            <h4>Streaming</h4>
+            <p>Real-time response streaming. See responses as they're generated.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">🤖</div>
+          <div>
+            <h4>Model Router</h4>
+            <p>Auto-select best provider based on task. Coding, writing, analysis.</p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">🐳</div>
+          <div>
+            <h4>Free Local AI</h4>
+            <p>Ollama integration. Run AI locally - free and private.</p>
+          </div>
+        </div>
+
+      </div>
     </div>
-  </div>
+  </section>
+
+  <section class="code-section" id="code">
+    <div class="container">
+      <h2 class="section-title">Simple to Use</h2>
+      <div class="code-block">
+        <pre><code><span class="code-comment">// Install</span>
+<span class="code-keyword">npm</span> install universal-ai-adapter
+
+<span class="code-comment">// Use in your code</span>
+<span class="code-keyword">import</span> { UniversalAIAdapter } <span class="code-keyword">from</span> <span class="code-string">'universal-ai-adapter'</span>;
+
+<span class="code-keyword">const</span> adapter = <span class="code-keyword">new</span> UniversalAIAdapter({
+  provider: <span class="code-string">'ollama'</span>,
+  providers: {
+    ollama: { baseURL: <span class="code-string">'http://localhost:11434'</span>, model: <span class="code-string">'llama3.2'</span> }
+  }
+});
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> adapter.simpleChat(<span class="code-string">'Hello!'</span>);
+<span class="code-function">console</span>.log(response);</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Version 1.2.0 | <a href="https://github.com/anomalyco/universal-ai-adapter">GitHub</a> | <a href="https://www.npmjs.com/package/universal-ai-adapter">NPM</a></p>
+      <p style="margin-top: 10px; font-size: 13px;">MIT License - Built with ❤️</p>
+    </div>
+  </footer>
+
 </body>
 </html>

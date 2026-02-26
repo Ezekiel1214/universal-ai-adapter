@@ -430,6 +430,39 @@
       40% { transform: scale(1); }
     }
 
+    /* Loading state */
+    .message.loading {
+      background: var(--bg-tertiary);
+      border: 1px dashed var(--accent-primary);
+    }
+
+    .message.loading .content {
+      color: var(--accent-secondary);
+      font-style: italic;
+    }
+
+    .message.loading::after {
+      content: '...';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    /* Send button loading */
+    .send-btn.loading {
+      background: var(--bg-hover);
+      cursor: wait;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
     @media (max-width: 768px) {
       .sidebar {
         width: 60px;
@@ -657,13 +690,16 @@
 
       input.value = '';
       sendBtn.disabled = true;
+      sendBtn.innerHTML = '<span>⏳ Thinking...</span>';
       
       document.getElementById('emptyState')?.remove();
       
       messages.push({ role: 'user', content: message });
       addMessage('user', message);
       
-      const assistantMsg = addMessage('assistant', '', true);
+      // Show loading message
+      const assistantMsg = addMessage('assistant', '🤔 Thinking...', false);
+      assistantMsg.classList.add('loading');
       
       try {
         const model = document.getElementById('modelSelect').value;
@@ -686,13 +722,17 @@
 
         if (!res.ok) {
           const err = await res.json();
+          assistantMsg.classList.remove('loading');
           assistantMsg.classList.add('error');
           assistantMsg.querySelector('.content').textContent = `Error: ${err.error || 'Unknown error'}`;
           sendBtn.disabled = false;
+          sendBtn.innerHTML = '<span>Send</span><span>→</span>';
           return;
         }
 
         const data = await res.json();
+        assistantMsg.classList.remove('loading');
+        
         if (data.content) {
           assistantMsg.querySelector('.content').textContent = data.content;
           messages.push({ role: 'assistant', content: data.content });
@@ -701,6 +741,7 @@
           assistantMsg.querySelector('.content').textContent = `Error: ${data.error}`;
         }
       } catch (error) {
+        assistantMsg.classList.remove('loading');
         assistantMsg.classList.add('error');
         let errorMsg = `Error: ${error.message}`;
         
@@ -716,6 +757,7 @@
       }
 
       sendBtn.disabled = false;
+      sendBtn.innerHTML = '<span>Send</span><span>→</span>';
     }
 
     function addMessage(role, content, streaming = false) {
