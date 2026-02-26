@@ -45,7 +45,8 @@
     "axios": "^1.7.0",
     "express": "^5.2.1",
     "inquirer": "^9.3.8",
-    "openai": "^4.20.0"
+    "openai": "^4.20.0",
+    "universal-ai-adapter": "^1.2.0"
   },
   "devDependencies": {
     "@nx/eslint": "22.5.2",

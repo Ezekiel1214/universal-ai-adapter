@@ -458,6 +458,7 @@
         <div class="model-select">
           <label>Model:</label>
           <select id="modelSelect"></select>
+          <button onclick="loadModels()" title="Refresh models">🔄</button>
         </div>
         <button class="config-toggle" onclick="toggleConfig()">⚙️ Settings</button>
       </header>
@@ -473,11 +474,17 @@
 
       <div class="input-area">
         <div class="input-wrapper">
+          <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
+          <button class="icon-btn" onclick="document.getElementById('imageInput').click()" title="Add image">📎</button>
           <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
           <button class="send-btn" id="sendBtn" onclick="sendMessage()">
             <span>Send</span>
             <span>→</span>
           </button>
+        </div>
+        <div id="imagePreview" style="display:none; margin-top:10px; padding:10px;">
+          <img id="previewImg" style="max-width:200px; max-height:100px; border-radius:8px;">
+          <button onclick="clearImage()" style="margin-left:10px;">✕</button>
         </div>
       </div>
     </main>
@@ -527,22 +534,28 @@
     ];
 
     const models = {
-      openai: ['gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'],
-      anthropic: ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229'],
-      groq: ['llama-3.1-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
+      openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4o-realtime-preview', 'o1', 'o1-mini'],
+      anthropic: ['claude-sonnet-4-20250514', 'claude-3-5-sonnet-20241022', 'claude-3-opus-20240229'],
+      groq: ['llama-3.3-70b-versatile', 'llama-3.1-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
       deepseek: ['deepseek-chat', 'deepseek-coder'],
-      ollama: []
+      ollama: ['llama3.2:latest', 'llama3.2', 'llama3', 'mistral', 'codellama']
     };
 
     async function loadModels() {
       try {
         const res = await fetch(`${API_BASE}/api/models`);
         const data = await res.json();
+        console.log('Models loaded:', data);
         Object.assign(models, data);
       } catch (e) {
-        console.error('Failed to load models');
+        console.error('Failed to load models', e);
       }
       renderProviders();
+      // Auto-select first Ollama model if available
+      if (models.ollama && models.ollama.length > 0) {
+        const select = document.getElementById('modelSelect');
+        select.value = models.ollama[0];
+      }
     }
 
     function renderProviders() {
@@ -664,6 +677,14 @@
           })
         });
 
+        if (!res.ok) {
+          const err = await res.json();
+          assistantMsg.classList.add('error');
+          assistantMsg.querySelector('.content').textContent = `Error: ${err.error || 'Unknown error'}`;
+          sendBtn.disabled = false;
+          return;
+        }
+
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let content = '';
@@ -691,7 +712,17 @@
         messages.push({ role: 'assistant', content });
       } catch (error) {
         assistantMsg.classList.add('error');
-        assistantMsg.querySelector('.content').textContent = `Error: ${error.message}`;
+        let errorMsg = `Error: ${error.message}`;
+        
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMsg = '❌ Cannot connect to server. Make sure the server is running.';
+        } else if (error.message.includes('All providers failed')) {
+          errorMsg = '❌ All AI providers failed. Check:\n• Ollama is running (http://localhost:11434)\n• API keys are configured for paid providers';
+        } else if (error.message.includes('ECONNREFUSED')) {
+          errorMsg = '❌ Connection refused. Is Ollama running?';
+        }
+        
+        assistantMsg.querySelector('.content').textContent = errorMsg;
       }
 
       sendBtn.disabled = false;

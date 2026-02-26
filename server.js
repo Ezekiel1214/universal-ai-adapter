@@ -86,14 +86,24 @@ app.post('/api/providers/status', async (req, res) => {
   }
 });
 
-app.get('/api/models', (req, res) => {
-  res.json({
-    openai: ['gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'],
-    anthropic: ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229'],
-    groq: ['llama-3.1-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
+app.get('/api/models', async (req, res) => {
+  const result = {
+    openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4o-realtime-preview', 'o1', 'o1-mini'],
+    anthropic: ['claude-sonnet-4-20250514', 'claude-3-5-sonnet-20241022', 'claude-3-opus-20240229'],
+    groq: ['llama-3.3-70b-versatile', 'llama-3.1-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
     deepseek: ['deepseek-chat', 'deepseek-coder'],
-    ollama: [] 
-  });
+    ollama: []
+  };
+  
+  try {
+    const ollamaRes = await fetch('http://localhost:11434/api/tags');
+    const data = await ollamaRes.json();
+    result.ollama = data.models?.map(m => m.name) || [];
+  } catch (e) {
+    // Ollama not available
+  }
+  
+  res.json(result);
 });
 
 app.listen(PORT, () => {
