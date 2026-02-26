@@ -1,6 +1,6 @@
 {
   "name": "universal-ai-adapter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Universal adapter for multiple AI providers with automatic fallback",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
