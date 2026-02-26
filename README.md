@@ -50,6 +50,28 @@ npm install @anthropic-ai/sdk
 npm install axios
 ```
 
+## CLI (Executable)
+
+Download `universal-ai-adapter.exe` from the releases page, or build it yourself:
+
+```bash
+# Build the exe
+npm install -g pkg
+pkg cli.cjs --targets node18-win-x64 --output universal-ai-adapter.exe
+```
+
+### CLI Usage
+
+```bash
+# Check Ollama status
+universal-ai-adapter.exe status http://localhost:11434
+
+# Chat with Ollama
+universal-ai-adapter.exe chat http://localhost:11434 llama3.2 "Hello!"
+```
+
+**Note:** The CLI only supports Ollama. For all providers, use the npm package.
+
 ## Quick Start
 
 ### 1. Basic Usage (Free with Ollama)
