@@ -23,7 +23,9 @@
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "cli": "node cli.ts"
+    "cli": "node cli.cjs",
+    "server": "node server.js",
+    "start": "node server.js"
   },
   "keywords": [
     "ai",
@@ -41,12 +43,14 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
     "axios": "^1.7.0",
+    "express": "^5.2.1",
     "inquirer": "^9.3.8",
     "openai": "^4.20.0"
   },
   "devDependencies": {
     "@nx/eslint": "22.5.2",
     "@nx/jest": "22.5.2",
+    "@types/express-serve-static-core": "^5.1.1",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.10.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
