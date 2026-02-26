@@ -23,5 +23,5 @@
     "es2022": true,
     "jest": true
   },
-  "ignorePatterns": ["dist/", "node_modules/", "coverage/", "*.js"]
+  "ignorePatterns": ["dist/", "node_modules/", "coverage/", "*.js", "src/__tests__/"]
 }

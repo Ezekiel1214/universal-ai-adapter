@@ -2,6 +2,7 @@ import { UniversalAIAdapter } from './adapter.js';
 import { ResponseCache, CacheConfig, CachePresets } from './cache.js';
 import { RateLimiter, RetryHandler, CircuitBreaker, RateLimitConfig, RetryConfig } from './rate-limit.js';
 import { MetricsCollector, generateDashboard, DashboardData } from './metrics.js';
+import { ModelRouter, RouterConfig, TaskType, RoutingDecision } from './model-router.js';
 import { AIProvider, Message, ChatRequest, ChatResponse, UniversalAIConfig } from './types.js';
 
 /**
@@ -36,6 +37,12 @@ export interface SmartAdapterConfig extends UniversalAIConfig {
   metrics?: {
     enabled: boolean;
     maxMetrics?: number;
+  };
+
+  // Model router configuration
+  router?: {
+    enabled: boolean;
+    config?: Partial<RouterConfig>;
   };
 }
 
@@ -104,6 +111,7 @@ export class SmartAdapter {
   private retryHandler?: RetryHandler;
   private circuitBreaker?: CircuitBreaker;
   private metricsCollector?: MetricsCollector;
+  private modelRouter?: ModelRouter;
   
   private config: SmartAdapterConfig & {
     cache: Required<SmartAdapterConfig['cache']>;
@@ -111,6 +119,7 @@ export class SmartAdapter {
     retry: Required<SmartAdapterConfig['retry']>;
     circuitBreaker: Required<SmartAdapterConfig['circuitBreaker']>;
     metrics: Required<SmartAdapterConfig['metrics']>;
+    router: Required<SmartAdapterConfig['router']>;
   };
 
   constructor(config: SmartAdapterConfig) {
@@ -136,11 +145,20 @@ export class SmartAdapter {
       metrics: {
         enabled: config.metrics?.enabled ?? true,
         maxMetrics: config.metrics?.maxMetrics ?? 10000
+      },
+      router: {
+        enabled: config.router?.enabled ?? false,
+        config: config.router?.config || undefined
       }
     } as any;
 
     // Initialize core adapter
     this.adapter = new UniversalAIAdapter(config);
+
+    // Initialize model router
+    if (this.config.router?.enabled && this.config.router?.config) {
+      this.modelRouter = new ModelRouter(this.config.router.config);
+    }
 
     // Initialize optional features
     this.initializeFeatures();
@@ -511,6 +529,39 @@ export class SmartAdapter {
     if (this.retryHandler) {
       this.retryHandler.updateConfig(config);
     }
+  }
+
+  /**
+   * Get the model router instance (if enabled)
+   */
+  getRouter(): ModelRouter | undefined {
+    return this.modelRouter;
+  }
+
+  /**
+   * Route request to optimal provider based on task type
+   */
+  routeRequest(taskType: TaskType, messages: Message[]): RoutingDecision | null {
+    if (!this.modelRouter) {
+      return null;
+    }
+    return this.modelRouter.route({ taskType, messages });
+  }
+
+  /**
+   * Switch to optimal provider for a task
+   */
+  async switchForTask(taskType: TaskType, messages: Message[]): Promise<boolean> {
+    if (!this.modelRouter) {
+      return false;
+    }
+
+    const decision = this.modelRouter.route({ taskType, messages });
+    if (decision) {
+      this.adapter.switchProvider(decision.provider);
+      return true;
+    }
+    return false;
   }
 }
 

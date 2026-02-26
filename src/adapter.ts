@@ -12,6 +12,7 @@ import { AnthropicProvider } from './providers/anthropic.js';
 import { OllamaProvider } from './providers/ollama.js';
 import { GroqProvider } from './providers/groq.js';
 import { DeepSeekProvider } from './providers/deepseek.js';
+import { StreamChunk, StreamAggregator } from './streaming.js';
 
 /**
  * Universal AI Adapter
@@ -266,5 +267,49 @@ export class UniversalAIAdapter {
     });
 
     return response.content;
+  }
+
+  /**
+   * Check if current provider supports streaming
+   */
+  supportsStreaming(): boolean {
+    if (!this.currentProvider) {
+      return false;
+    }
+    return this.currentProvider.supportsStreaming?.() ?? false;
+  }
+
+  /**
+   * Stream chat response (if provider supports it)
+   */
+  async* stream(request: ChatRequest): AsyncGenerator<StreamChunk, void, unknown> {
+    if (!this.currentProvider) {
+      throw new AIAdapterError('No provider initialized', 'none');
+    }
+
+    if (!this.currentProvider.stream) {
+      throw new AIAdapterError(
+        `Provider ${this.currentProvider.name} does not support streaming`,
+        this.config.provider
+      );
+    }
+
+    yield* this.currentProvider.stream(request);
+  }
+
+  /**
+   * Stream chat with automatic aggregation
+   */
+  async streamChat(request: ChatRequest): Promise<{ content: string; stream: AsyncGenerator<StreamChunk, void, unknown> }> {
+    const aggregator = new StreamAggregator();
+    
+    const stream = this.stream(request);
+    
+    return {
+      stream,
+      get content() {
+        return aggregator.getContent();
+      }
+    };
   }
 }
