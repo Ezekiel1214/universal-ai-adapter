@@ -1,0 +1,41 @@
+{
+  "name": "universal-ai-providers",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "root": "libs/providers",
+  "sourceRoot": "libs/providers/src",
+  "implicitDependencies": [
+    "universal-ai-shared"
+  ],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "eslint ./libs/providers/src --ext .ts --ignore-pattern *.d.ts"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": ".\\node_modules\\.bin\\tsc.cmd -p tsconfig.json --noEmit --pretty false"
+      }
+    },
+    "verify": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          ".\\node_modules\\.bin\\eslint.cmd .\\libs\\providers\\src --ext .ts --ignore-pattern *.d.ts",
+          ".\\node_modules\\.bin\\tsc.cmd -p tsconfig.json --noEmit --pretty false"
+        ],
+        "parallel": false
+      }
+    }
+  },
+  "tags": [
+    "scope:providers",
+    "type:lib"
+  ]
+}

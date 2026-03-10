@@ -15,3 +15,8 @@ coverage/
 
 .nx/cache
 .nx/workspace-data
+.tsbuildinfo
+.nx-mcp-http.log
+.nx-mcp-http.err.log
+nul
+

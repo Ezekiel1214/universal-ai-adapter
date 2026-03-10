@@ -1,0 +1,55 @@
+{
+  "name": "universal-ai-adapter-server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "root": "apps/server",
+  "sourceRoot": "apps/server/src",
+  "implicitDependencies": [
+    "universal-ai-adapter"
+  ],
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node server.js"
+      }
+    },
+    "check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node --check apps/server/src/main.js"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node --check apps/server/src/main.js"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node --check apps/server/src/main.js"
+      }
+    },
+    "verify": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node --check apps/server/src/main.js",
+          "node --check server.js"
+        ],
+        "parallel": false
+      }
+    }
+  },
+  "tags": [
+    "scope:server",
+    "type:app"
+  ]
+}

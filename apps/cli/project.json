@@ -1,0 +1,55 @@
+{
+  "name": "universal-ai-adapter-cli",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "root": "apps/cli",
+  "sourceRoot": "apps/cli/src",
+  "implicitDependencies": [
+    "universal-ai-adapter"
+  ],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "tsc apps/cli/src/main.ts --outDir dist/apps/cli --esModuleInterop --module NodeNext --moduleResolution NodeNext --target ES2022 --skipLibCheck"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": ".\\node_modules\\.bin\\eslint.cmd .\\apps\\cli\\src --ext .ts --no-ignore --config apps/cli/.eslintrc.cjs"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": ".\\node_modules\\.bin\\tsc.cmd apps/cli/src/main.ts --noEmit --esModuleInterop --module NodeNext --moduleResolution NodeNext --target ES2022 --skipLibCheck"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node cli.ts"
+      }
+    },
+    "verify": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          ".\\node_modules\\.bin\\eslint.cmd .\\apps\\cli\\src --ext .ts --no-ignore --config apps/cli/.eslintrc.cjs",
+          ".\\node_modules\\.bin\\tsc.cmd apps/cli/src/main.ts --noEmit --esModuleInterop --module NodeNext --moduleResolution NodeNext --target ES2022 --skipLibCheck"
+        ],
+        "parallel": false
+      }
+    }
+  },
+  "tags": [
+    "scope:cli",
+    "type:app"
+  ]
+}

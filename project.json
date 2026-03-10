@@ -1,0 +1,64 @@
+{
+  "name": "universal-ai-adapter",
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "root": ".",
+  "sourceRoot": "libs/sdk/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "tsc"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "eslint ./libs/sdk/src"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+      }
+    },
+    "jest:test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": ".\\node_modules\\.bin\\tsc.cmd -p tsconfig.json --noEmit --pretty false"
+      }
+    },
+    "verify": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          ".\\node_modules\\.bin\\eslint.cmd .\\libs\\sdk\\src --ext .ts",
+          ".\\node_modules\\.bin\\tsc.cmd -p tsconfig.json --noEmit --pretty false",
+          "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand"
+        ],
+        "parallel": false
+      }
+    }
+  },
+  "tags": [
+    "scope:sdk",
+    "type:lib"
+  ],
+  "implicitDependencies": [
+    "universal-ai-shared",
+    "universal-ai-providers"
+  ]
+}

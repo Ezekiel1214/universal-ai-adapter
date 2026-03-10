@@ -10,17 +10,18 @@ export default {
       'ts-jest',
       {
         useESM: true,
+        tsconfig: 'tsconfig.test.json'
       },
     ],
   },
   testMatch: [
-    '**/__tests__/**/*.test.ts',
-    '**/?(*.)+(spec|test).ts'
+    '<rootDir>/libs/sdk/src/**/__tests__/**/*.test.ts',
+    '<rootDir>/libs/sdk/src/**/?(*.)+(spec|test).ts'
   ],
   collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/index.ts'
+    'libs/sdk/src/**/*.ts',
+    '!libs/sdk/src/**/*.d.ts',
+    '!libs/sdk/src/index.ts'
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],

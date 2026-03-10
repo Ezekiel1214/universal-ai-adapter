@@ -1,0 +1,38 @@
+{
+  "name": "universal-ai-shared",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "root": "libs/shared",
+  "sourceRoot": "libs/shared/src",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "eslint ./libs/shared/src --ext .ts --ignore-pattern *.d.ts"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": ".\\node_modules\\.bin\\tsc.cmd -p tsconfig.json --noEmit --pretty false"
+      }
+    },
+    "verify": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          ".\\node_modules\\.bin\\eslint.cmd .\\libs\\shared\\src --ext .ts --ignore-pattern *.d.ts",
+          ".\\node_modules\\.bin\\tsc.cmd -p tsconfig.json --noEmit --pretty false"
+        ],
+        "parallel": false
+      }
+    }
+  },
+  "tags": [
+    "scope:shared",
+    "type:lib"
+  ]
+}

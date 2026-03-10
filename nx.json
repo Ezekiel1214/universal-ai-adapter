@@ -15,5 +15,58 @@
       }
     }
   ],
-  "nxCloudId": "699eb3ccc8f18759f1daa7c9"
+  "nxCloudId": "699eb3ccc8f18759f1daa7c9",
+  "workspaceLayout": {
+    "libsDir": "libs",
+    "appsDir": "apps"
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/*.test.ts",
+      "!{projectRoot}/**/*.spec.ts",
+      "!{projectRoot}/**/__tests__/**"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/tsconfig.json",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/.eslintrc.json"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "inputs": [
+        "production",
+        "^production"
+      ]
+    },
+    "lint": {
+      "inputs": [
+        "default",
+        "^default"
+      ]
+    },
+    "test": {
+      "inputs": [
+        "default",
+        "^default"
+      ]
+    },
+    "typecheck": {
+      "inputs": [
+        "default",
+        "^default"
+      ]
+    },
+    "check": {
+      "inputs": [
+        "default",
+        "^default"
+      ]
+    }
+  }
 }
