@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Universal AI Adapter - one organized interface for multiple AI providers">
+  <meta name="theme-color" content="#0d9488">
+  <title>Universal AI Adapter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6fbfc;
+      --surface: #ffffff;
+      --line: #dbe7eb;
+      --text: #0e1b22;
+      --muted: #47606b;
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --orange: #ea580c;
+      --shadow: 0 14px 36px rgba(14, 27, 34, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Manrope, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 600px at 100% 0%, #b6f2ec 0%, transparent 58%),
+        radial-gradient(700px 500px at 0% 90%, #ffe6cf 0%, transparent 52%),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 22px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+
+    .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(140deg, var(--teal), #14b8a6);
+      font-size: 17px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 3.3vw, 3rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 1rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 16px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      background: #fff;
+    }
+
+    .btn.primary {
+      background: var(--teal);
+      color: #fff;
+      border-color: var(--teal);
+    }
+
+    .btn.primary:hover { background: var(--teal-dark); }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      background: #f3f8fa;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.3rem;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .feature .tag {
+      display: inline-block;
+      width: fit-content;
+      font-size: 12px;
+      font-weight: 700;
+      color: #7c2d12;
+      background: #ffedd5;
+      border: 1px solid #fed7aa;
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+
+    .feature h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .feature p {
+      font-size: 0.93rem;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="nav">
+      <div class="brand">
+        <div class="logo">AI</div>
+        <span>Universal AI Adapter</span>
+      </div>
+      <a class="btn primary" href="index.html">Open Workspace</a>
+    </header>
+
+    <section class="hero">
+      <article class="card">
+        <h1>One clean workspace for multi-provider AI chat.</h1>
+        <p>Use a single interface for OpenAI, Anthropic, Ollama, Gemini, Groq, DeepSeek, and more. Compare outputs side-by-side and keep your workflow focused.</p>
+        <div class="actions">
+          <a class="btn primary" href="index.html">Launch App</a>
+          <a class="btn" href="https://github.com" target="_blank" rel="noopener">View Repo</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <p style="margin-bottom:8px;font-weight:800;color:var(--text);">At a glance</p>
+        <div class="stat-grid">
+          <div class="stat">
+            <strong>15+</strong>
+            <p>Providers supported</p>
+          </div>
+          <div class="stat">
+            <strong>2</strong>
+            <p>Modes: Chat and Compare</p>
+          </div>
+          <div class="stat">
+            <strong>1</strong>
+            <p>Unified API surface</p>
+          </div>
+          <div class="stat">
+            <strong>Fast</strong>
+            <p>Runs on your local adapter server</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="features">
+      <article class="feature">
+        <span class="tag">Organized</span>
+        <h3>Focused control panel</h3>
+        <p>Provider, model, key, prompt, and token controls are grouped so setup is clear and quick.</p>
+      </article>
+      <article class="feature">
+        <span class="tag">Simple</span>
+        <h3>Single message flow</h3>
+        <p>Use Enter to send, Shift+Enter for new line, and quick prompt shortcuts for repeatable tasks.</p>
+      </article>
+      <article class="feature">
+        <span class="tag">Modern</span>
+        <h3>Responsive UI system</h3>
+        <p>Designed for desktop and mobile with deliberate typography, soft gradients, and clean spacing.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

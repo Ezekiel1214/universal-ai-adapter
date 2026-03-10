@@ -2,775 +2,787 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="Universal AI Adapter - Unified interface for all AI providers">
-  <meta name="theme-color" content="#6366f1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="AI Adapter">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Universal AI Adapter - organized multi-provider AI chat workspace">
+  <meta name="theme-color" content="#0d9488">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon.svg">
-  <title>Universal AI Adapter</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Universal AI Adapter Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #12121a;
-      --bg-tertiary: #1a1a25;
-      --bg-hover: #222230;
-      --text-primary: #f0f0f5;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent-primary: #6366f1;
-      --accent-secondary: #818cf8;
-      --accent-glow: rgba(99, 102, 241, 0.3);
-      --border-color: #2a2a3a;
-      --success: #22c55e;
-      --error: #ef4444;
-      --warning: #f59e0b;
+      --bg: #f4f7f8;
+      --surface: #ffffff;
+      --surface-soft: #eef3f5;
+      --text: #102027;
+      --muted: #4f6770;
+      --line: #d6e2e8;
+      --teal: #0d9488;
+      --teal-dark: #0f766e;
+      --orange: #ea580c;
+      --red: #dc2626;
+      --shadow: 0 10px 30px rgba(16, 32, 39, 0.08);
+      --radius: 16px;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      margin: 0;
       min-height: 100vh;
-      overflow-x: hidden;
+      font-family: Manrope, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 85% -10%, #b7f3ec 0%, transparent 60%),
+        radial-gradient(900px 500px at 0% 100%, #ffe0c2 0%, transparent 55%),
+        var(--bg);
     }
 
     .app {
-      display: flex;
-      height: 100vh;
-    }
-
-    .sidebar {
-      width: 280px;
-      background: var(--bg-secondary);
-      border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 0;
-      margin-bottom: 24px;
-    }
-
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-
-    .logo-text {
-      font-size: 18px;
-      font-weight: 600;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .section-title {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .provider-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .provider-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--bg-tertiary);
-      border: 1px solid transparent;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: var(--text-primary);
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .provider-btn:hover {
-      background: var(--bg-hover);
-      border-color: var(--border-color);
-    }
-
-    .provider-btn.active {
-      background: var(--accent-primary);
-      border-color: var(--accent-secondary);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-
-    .provider-btn .status {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-left: auto;
-    }
-
-    .provider-btn .status.online { background: var(--success); }
-    .provider-btn .status.offline { background: var(--error); }
-    .provider-btn .status.unknown { background: var(--text-muted); }
-
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
     }
 
     .header {
-      height: 60px;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-    }
-
-    .model-select {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .model-select label {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    select {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: var(--text-primary);
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    select:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-    }
-
-    .chat-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .message {
-      max-width: 80%;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       padding: 16px 20px;
-      border-radius: 16px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message.user {
-      align-self: flex-end;
-      background: var(--accent-primary);
-      border-bottom-right-radius: 4px;
-    }
-
-    .message.assistant {
-      align-self: flex-start;
-      background: var(--bg-tertiary);
-      border-bottom-left-radius: 4px;
-    }
-
-    .message.error {
-      align-self: flex-start;
-      background: rgba(239, 68, 68, 0.2);
-      border: 1px solid var(--error);
-      color: var(--error);
-    }
-
-    .message.streaming {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--accent-primary);
-    }
-
-    .input-area {
-      padding: 20px 24px;
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border-color);
-    }
-
-    .input-wrapper {
-      display: flex;
-      gap: 12px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 14px 20px;
-      color: var(--text-primary);
-      font-size: 15px;
-      font-family: inherit;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
-    input[type="text"]::placeholder {
-      color: var(--text-muted);
-    }
-
-    .send-btn {
-      background: var(--accent-primary);
-      border: none;
-      border-radius: 12px;
-      padding: 14px 24px;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .send-btn:hover {
-      background: var(--accent-secondary);
-      transform: translateY(-1px);
-    }
-
-    .send-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .config-panel {
-      position: fixed;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      width: 360px;
-      background: var(--bg-secondary);
-      border-left: 1px solid var(--border-color);
-      padding: 24px;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      overflow-y: auto;
-      z-index: 100;
-    }
-
-    .config-panel.open {
-      transform: translateX(0);
-    }
-
-    .config-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
 
-    .close-btn {
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 24px;
-      cursor: pointer;
-      padding: 4px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-    }
-
-    .form-group input {
-      width: 100%;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px;
-      color: var(--text-primary);
-      font-size: 14px;
-    }
-
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-    }
-
-    .form-group .hint {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    .save-btn {
-      width: 100%;
-      background: var(--accent-primary);
-      border: none;
-      border-radius: 10px;
-      padding: 14px;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 24px;
-    }
-
-    .save-btn:hover {
-      background: var(--accent-secondary);
-    }
-
-    .config-toggle {
-      position: fixed;
-      right: 20px;
-      top: 20px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 10px 16px;
-      color: var(--text-primary);
-      font-size: 14px;
-      cursor: pointer;
-      z-index: 50;
-    }
-
-    .config-toggle:hover {
-      background: var(--bg-hover);
-    }
-
-    .empty-state {
-      flex: 1;
+    .brand {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      gap: 16px;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
     }
 
-    .empty-state svg {
-      width: 64px;
-      height: 64px;
-      opacity: 0.5;
+    .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(140deg, var(--teal), #14b8a6);
+      font-size: 18px;
     }
 
-    .typing-indicator {
-      display: flex;
+    .status {
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      min-height: 72vh;
+    }
+
+    .panel,
+    .workspace {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 2px;
+      font-weight: 700;
+    }
+
+    .row { display: grid; gap: 8px; }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    input,
+    textarea,
+    select,
+    button {
+      font-family: inherit;
+      font-size: 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      padding: 10px 12px;
+    }
+
+    textarea { resize: vertical; }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 120ms ease, background-color 120ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--teal-dark); }
+
+    .btn-soft {
+      background: var(--surface-soft);
+      border-color: var(--line);
+    }
+
+    .mode-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surface-soft);
+      border-radius: 12px;
+      padding: 4px;
       gap: 4px;
+    }
+
+    .mode-btn {
+      border: none;
+      background: transparent;
+      font-weight: 700;
+      color: var(--muted);
       padding: 8px;
     }
 
-    .typing-indicator span {
-      width: 8px;
-      height: 8px;
-      background: var(--accent-primary);
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out;
+    .mode-btn.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(16, 32, 39, 0.08);
     }
 
-    .typing-indicator span:nth-child(1) { animation-delay: 0s; }
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0.6); }
-      40% { transform: scale(1); }
+    .provider-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      max-height: 200px;
+      overflow: auto;
+      padding-right: 2px;
     }
 
-    /* Loading state */
-    .message.loading {
-      background: var(--bg-tertiary);
-      border: 1px dashed var(--accent-primary);
+    .provider-chip {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: var(--surface-soft);
+      font-size: 12px;
+      color: var(--text);
     }
 
-    .message.loading .content {
-      color: var(--accent-secondary);
-      font-style: italic;
+    .workspace {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      overflow: hidden;
     }
 
-    .message.loading::after {
-      content: '...';
-      animation: dots 1.5s infinite;
+    .feed {
+      overflow: auto;
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
     }
 
-    @keyframes dots {
-      0%, 20% { content: '.'; }
-      40% { content: '..'; }
-      60%, 100% { content: '...'; }
+    .empty {
+      background: var(--surface-soft);
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      padding: 22px;
+      color: var(--muted);
+      text-align: center;
     }
 
-    /* Send button loading */
-    .send-btn.loading {
-      background: var(--bg-hover);
-      cursor: wait;
+    .bubble {
+      max-width: min(850px, 92%);
+      border-radius: 14px;
+      padding: 12px 14px;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      border: 1px solid var(--line);
+      background: #fff;
+      animation: fadeIn 220ms ease;
     }
 
-    .send-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
+    .bubble.user {
+      margin-left: auto;
+      background: #e8fffb;
+      border-color: #b4efe5;
     }
 
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 60px;
-        padding: 12px;
+    .bubble.assistant {
+      margin-right: auto;
+    }
+
+    .bubble .meta {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .compare-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--orange);
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      gap: 6px;
+      animation: fadeIn 220ms ease;
+    }
+
+    .compare-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .compare-head strong { color: var(--text); }
+
+    .composer {
+      border-top: 1px solid var(--line);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      background: #fff;
+    }
+
+    .composer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .composer textarea {
+      min-height: 78px;
+      max-height: 220px;
+    }
+
+    .send {
+      min-width: 110px;
+      height: 44px;
+    }
+
+    .quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quick button {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+    }
+
+    .footnote {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px) {
+      .shell {
+        grid-template-columns: 1fr;
       }
-      .logo-text, .section-title, .provider-btn span {
-        display: none;
+
+      .panel {
+        order: 2;
       }
-      .provider-btn {
-        justify-content: center;
-        padding: 12px;
-      }
-      .message {
-        max-width: 90%;
+
+      .workspace {
+        min-height: 70vh;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="logo">
-        <div class="logo-icon">🤖</div>
-        <span class="logo-text">AI Adapter</span>
-      </div>
-
-      <div class="section-title">Providers</div>
-      <div class="provider-list" id="providerList"></div>
-    </aside>
-
-    <main class="main">
-      <header class="header">
-        <div class="model-select">
-          <label>Model:</label>
-          <select id="modelSelect"></select>
-          <button onclick="loadModels()" title="Refresh models">🔄</button>
-        </div>
-        <button class="config-toggle" onclick="toggleConfig()">⚙️ Settings</button>
-      </header>
-
-      <div class="chat-container" id="chatContainer">
-        <div class="empty-state" id="emptyState">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-          </svg>
-          <p>Start a conversation</p>
+  <main class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">AI</div>
+        <div>
+          <div>Universal AI Adapter</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:600;">Simple, organized, modern workspace</div>
         </div>
       </div>
+      <div id="healthBadge" class="status">Checking API...</div>
+    </header>
 
-      <div class="input-area">
-        <div class="input-wrapper">
-          <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
-          <button class="icon-btn" onclick="document.getElementById('imageInput').click()" title="Add image">📎</button>
-          <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-            <span>Send</span>
-            <span>→</span>
-          </button>
+    <section class="shell">
+      <aside class="panel">
+        <div>
+          <div class="section-title">Mode</div>
+          <div class="mode-toggle">
+            <button id="modeChat" class="mode-btn active" type="button">Chat</button>
+            <button id="modeCompare" class="mode-btn" type="button">Compare</button>
+          </div>
         </div>
-        <div id="imagePreview" style="display:none; margin-top:10px; padding:10px;">
-          <img id="previewImg" style="max-width:200px; max-height:100px; border-radius:8px;">
-          <button onclick="clearImage()" style="margin-left:10px;">✕</button>
+
+        <div class="row">
+          <div class="section-title">Provider</div>
+          <label for="provider">Primary Provider</label>
+          <select id="provider"></select>
+          <label for="model">Model</label>
+          <select id="model"></select>
+          <button id="refreshModels" class="btn-soft" type="button">Refresh Models</button>
         </div>
-      </div>
-    </main>
 
-    <div class="config-panel" id="configPanel">
-      <div class="config-title">
-        Provider Settings
-        <button class="close-btn" onclick="toggleConfig()">×</button>
-      </div>
+        <div class="row">
+          <div class="section-title">Credentials</div>
+          <label for="apiKey">API Key (optional for local providers)</label>
+          <input id="apiKey" type="password" placeholder="sk-...">
+        </div>
 
-      <div class="form-group">
-        <label>API Key / Base URL</label>
-        <input type="text" id="configApiKey" placeholder="API key or Ollama URL">
-        <div class="hint" id="configHint">For Ollama: http://localhost:11434</div>
-      </div>
+        <div class="row">
+          <div class="section-title">Prompt Controls</div>
+          <label for="systemPrompt">System Prompt</label>
+          <textarea id="systemPrompt" rows="4" placeholder="You are a concise and practical assistant."></textarea>
+          <label for="temperature">Temperature</label>
+          <input id="temperature" type="number" min="0" max="2" step="0.1" value="0.7">
+          <label for="maxTokens">Max Tokens</label>
+          <input id="maxTokens" type="number" min="64" max="8192" step="64" value="1024">
+          <label><input id="useKnowledgeBase" type="checkbox"> Use knowledge base context</label>
+        </div>
 
-      <div class="form-group">
-        <label>Temperature</label>
-        <input type="number" id="configTemp" value="0.7" min="0" max="2" step="0.1">
-      </div>
+        <div id="compareProvidersWrap" class="row" style="display:none;">
+          <div class="section-title">Compare Providers</div>
+          <div id="compareProviders" class="provider-grid"></div>
+        </div>
+      </aside>
 
-      <div class="form-group">
-        <label>Max Tokens</label>
-        <input type="number" id="configMaxTokens" value="2048" min="1" max="128000">
-      </div>
+      <section class="workspace">
+        <div id="feed" class="feed">
+          <div class="empty">Start a conversation, or switch to compare mode to query multiple providers at once.</div>
+        </div>
 
-      <button class="save-btn" onclick="saveConfig()">Save Configuration</button>
-    </div>
-  </div>
+        <div class="composer">
+          <div class="quick">
+            <button type="button" data-quick="Summarize this topic in 5 bullets.">Summarize</button>
+            <button type="button" data-quick="Give me a practical step-by-step plan.">Plan</button>
+            <button type="button" data-quick="Compare trade-offs between 3 approaches.">Trade-offs</button>
+          </div>
+
+          <div class="composer-row">
+            <textarea id="messageInput" placeholder="Ask anything..."></textarea>
+            <button id="sendBtn" class="btn-primary send" type="button">Send</button>
+          </div>
+
+          <div class="footnote">Runs on your existing Universal AI Adapter API endpoints.</div>
+        </div>
+      </section>
+    </section>
+  </main>
 
   <script>
-    const API_BASE = '';
-    let currentProvider = 'ollama';
-    let messages = [];
-    let config = {
-      apiKey: '',
-      temperature: 0.7,
-      maxTokens: 2048
+    const API = window.location.origin;
+    const PROVIDERS = ['ollama', 'localai', 'cerebras', 'openrouter', 'qwen', 'kimi', 'mistral', 'perplexity', 'minimax', 'zhipu', 'gemini', 'openai', 'anthropic', 'groq', 'deepseek'];
+
+    const state = {
+      mode: 'chat',
+      models: {},
+      messages: [],
+      compareProviders: new Set(['ollama', 'openai', 'anthropic'])
     };
 
-    const providers = [
-      { id: 'ollama', name: 'Ollama', icon: '🐳', free: true },
-      { id: 'openai', name: 'OpenAI', icon: '🔵', free: false },
-      { id: 'anthropic', name: 'Anthropic', icon: '🟤', free: false },
-      { id: 'groq', name: 'Groq', icon: '🟣', free: true },
-      { id: 'deepseek', name: 'DeepSeek', icon: '🔷', free: true }
-    ];
-
-    const models = {
-      openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4o-realtime-preview', 'o1', 'o1-mini'],
-      anthropic: ['claude-sonnet-4-20250514', 'claude-3-5-sonnet-20241022', 'claude-3-opus-20240229'],
-      groq: ['llama-3.3-70b-versatile', 'llama-3.1-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
-      deepseek: ['deepseek-chat', 'deepseek-coder'],
-      ollama: ['llama3.2:latest', 'llama3.2', 'llama3', 'mistral', 'codellama']
+    const els = {
+      healthBadge: document.getElementById('healthBadge'),
+      modeChat: document.getElementById('modeChat'),
+      modeCompare: document.getElementById('modeCompare'),
+      provider: document.getElementById('provider'),
+      model: document.getElementById('model'),
+      refreshModels: document.getElementById('refreshModels'),
+      apiKey: document.getElementById('apiKey'),
+      systemPrompt: document.getElementById('systemPrompt'),
+      temperature: document.getElementById('temperature'),
+      maxTokens: document.getElementById('maxTokens'),
+      useKnowledgeBase: document.getElementById('useKnowledgeBase'),
+      compareProvidersWrap: document.getElementById('compareProvidersWrap'),
+      compareProviders: document.getElementById('compareProviders'),
+      feed: document.getElementById('feed'),
+      messageInput: document.getElementById('messageInput'),
+      sendBtn: document.getElementById('sendBtn')
     };
+
+    function init() {
+      bindEvents();
+      loadPersistedState();
+      renderProviderOptions();
+      renderCompareProviderOptions();
+      pingHealth();
+      loadModels();
+    }
+
+    function bindEvents() {
+      els.modeChat.addEventListener('click', () => setMode('chat'));
+      els.modeCompare.addEventListener('click', () => setMode('compare'));
+      els.refreshModels.addEventListener('click', loadModels);
+      els.provider.addEventListener('change', onProviderChange);
+      els.sendBtn.addEventListener('click', onSend);
+
+      els.messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          onSend();
+        }
+      });
+
+      document.querySelectorAll('[data-quick]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          els.messageInput.value = btn.dataset.quick;
+          els.messageInput.focus();
+        });
+      });
+
+      [els.apiKey, els.systemPrompt, els.temperature, els.maxTokens, els.useKnowledgeBase].forEach((input) => {
+        input.addEventListener('change', persistState);
+        input.addEventListener('input', persistState);
+      });
+    }
+
+    function loadPersistedState() {
+      const saved = JSON.parse(localStorage.getItem('uaa.web.state.v2') || '{}');
+      if (saved.mode) state.mode = saved.mode;
+
+      els.apiKey.value = saved.apiKey || '';
+      els.systemPrompt.value = saved.systemPrompt || '';
+      els.temperature.value = saved.temperature || '0.7';
+      els.maxTokens.value = saved.maxTokens || '1024';
+      els.useKnowledgeBase.checked = Boolean(saved.useKnowledgeBase);
+    }
+
+    function persistState() {
+      const payload = {
+        mode: state.mode,
+        provider: els.provider.value,
+        model: els.model.value,
+        apiKey: els.apiKey.value,
+        systemPrompt: els.systemPrompt.value,
+        temperature: els.temperature.value,
+        maxTokens: els.maxTokens.value,
+        useKnowledgeBase: els.useKnowledgeBase.checked,
+        compareProviders: Array.from(state.compareProviders)
+      };
+      localStorage.setItem('uaa.web.state.v2', JSON.stringify(payload));
+    }
+
+    function renderProviderOptions() {
+      els.provider.innerHTML = PROVIDERS.map((p) => `<option value="${p}">${p}</option>`).join('');
+
+      const saved = JSON.parse(localStorage.getItem('uaa.web.state.v2') || '{}');
+      if (saved.provider && PROVIDERS.includes(saved.provider)) {
+        els.provider.value = saved.provider;
+      }
+
+      if (saved.compareProviders && Array.isArray(saved.compareProviders)) {
+        state.compareProviders = new Set(saved.compareProviders.filter((p) => PROVIDERS.includes(p)));
+      }
+
+      setMode(state.mode);
+    }
+
+    function renderCompareProviderOptions() {
+      els.compareProviders.innerHTML = PROVIDERS.map((p) => {
+        const checked = state.compareProviders.has(p) ? 'checked' : '';
+        return `
+          <label class="provider-chip">
+            <input type="checkbox" value="${p}" ${checked}>
+            <span>${p}</span>
+          </label>
+        `;
+      }).join('');
+
+      els.compareProviders.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('change', () => {
+          if (cb.checked) {
+            state.compareProviders.add(cb.value);
+          } else {
+            state.compareProviders.delete(cb.value);
+          }
+          persistState();
+        });
+      });
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      els.modeChat.classList.toggle('active', mode === 'chat');
+      els.modeCompare.classList.toggle('active', mode === 'compare');
+      els.compareProvidersWrap.style.display = mode === 'compare' ? 'grid' : 'none';
+      persistState();
+      renderEmpty();
+    }
+
+    async function pingHealth() {
+      try {
+        const res = await fetch(`${API}/api/health`);
+        if (!res.ok) throw new Error('Health check failed');
+        els.healthBadge.textContent = 'API Ready';
+        els.healthBadge.style.background = '#dcfce7';
+        els.healthBadge.style.color = '#166534';
+      } catch {
+        els.healthBadge.textContent = 'API Offline';
+        els.healthBadge.style.background = '#fee2e2';
+        els.healthBadge.style.color = '#991b1b';
+      }
+    }
 
     async function loadModels() {
       try {
-        const res = await fetch(`${API_BASE}/api/models`);
-        const data = await res.json();
-        console.log('Models loaded:', data);
-        Object.assign(models, data);
-      } catch (e) {
-        console.error('Failed to load models', e);
+        const res = await fetch(`${API}/api/models`);
+        const models = await res.json();
+        state.models = models || {};
+      } catch {
+        state.models = {};
       }
-      renderProviders();
-      // Auto-select first Ollama model if available
-      if (models.ollama && models.ollama.length > 0) {
-        const select = document.getElementById('modelSelect');
-        select.value = models.ollama[0];
-      }
+      updateModelOptions();
     }
 
-    function renderProviders() {
-      const list = document.getElementById('providerList');
-      list.innerHTML = providers.map(p => `
-        <button class="provider-btn ${p.id === currentProvider ? 'active' : ''}" onclick="selectProvider('${p.id}')">
-          <span>${p.icon}</span>
-          <span>${p.name}</span>
-          ${p.free ? '<span style="font-size:10px;opacity:0.6">FREE</span>' : ''}
-          <span class="status unknown" id="status-${p.id}"></span>
-        </button>
-      `).join('');
-      
-      updateModelSelect();
-      checkProviderStatus();
+    function onProviderChange() {
+      updateModelOptions();
+      persistState();
     }
 
-    function updateModelSelect() {
-      const select = document.getElementById('modelSelect');
-      const providerModels = models[currentProvider] || [];
-      
-      if (providerModels.length === 0) {
-        select.innerHTML = '<option value="">Default</option>';
-        select.disabled = true;
-      } else {
-        select.innerHTML = providerModels.map(m => `<option value="${m}">${m}</option>`).join('');
-        select.disabled = false;
+    function updateModelOptions() {
+      const provider = els.provider.value;
+      const modelList = (state.models && state.models[provider]) || ['default'];
+      els.model.innerHTML = modelList.map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+
+      const saved = JSON.parse(localStorage.getItem('uaa.web.state.v2') || '{}');
+      if (saved.provider === provider && saved.model && modelList.includes(saved.model)) {
+        els.model.value = saved.model;
       }
     }
 
-    async function checkProviderStatus() {
-      for (const provider of providers) {
-        const statusEl = document.getElementById(`status-${provider.id}`);
-        if (!statusEl) continue;
-        
-        try {
-          const res = await fetch(`${API_BASE}/api/providers/status`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              provider: provider.id,
-              apiKey: provider.id === 'ollama' ? 'http://localhost:11434' : config.apiKey,
-              baseURL: provider.id === 'ollama' ? 'http://localhost:11434' : undefined
-            })
-          });
-          const statuses = await res.json();
-          const status = statuses.find(s => s.provider === provider.id);
-          statusEl.className = `status ${status?.available ? 'online' : 'offline'}`;
-        } catch {
-          statusEl.className = 'status offline';
-        }
-      }
-    }
-
-    function selectProvider(id) {
-      currentProvider = id;
-      renderProviders();
-      
-      const hint = document.getElementById('configHint');
-      if (id === 'ollama') {
-        hint.textContent = 'For Ollama: http://localhost:11434';
-      } else {
-        hint.textContent = `Enter ${id} API key`;
-      }
-    }
-
-    function toggleConfig() {
-      document.getElementById('configPanel').classList.toggle('open');
-    }
-
-    function saveConfig() {
-      config.apiKey = document.getElementById('configApiKey').value;
-      config.temperature = parseFloat(document.getElementById('configTemp').value);
-      config.maxTokens = parseInt(document.getElementById('configMaxTokens').value);
-      toggleConfig();
-      checkProviderStatus();
-    }
-
-    function handleKeyPress(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    }
-
-    async function sendMessage() {
-      const input = document.getElementById('messageInput');
-      const sendBtn = document.getElementById('sendBtn');
-      const message = input.value.trim();
-      
+    async function onSend() {
+      const message = els.messageInput.value.trim();
       if (!message) return;
 
-      input.value = '';
-      sendBtn.disabled = true;
-      sendBtn.innerHTML = '<span>⏳ Thinking...</span>';
-      
-      document.getElementById('emptyState')?.remove();
-      
-      messages.push({ role: 'user', content: message });
-      addMessage('user', message);
-      
-      // Show loading message
-      const assistantMsg = addMessage('assistant', '🤔 Thinking...', false);
-      assistantMsg.classList.add('loading');
-      
+      els.messageInput.value = '';
+
+      if (state.mode === 'compare') {
+        await runCompare(message);
+      } else {
+        await runChat(message);
+      }
+    }
+
+    async function runChat(content) {
+      state.messages.push({ role: 'user', content });
+      renderMessages();
+      setSending(true);
+
       try {
-        const model = document.getElementById('modelSelect').value;
-        const baseURL = currentProvider === 'ollama' ? (config.apiKey || 'http://localhost:11434') : undefined;
-        
-        const res = await fetch(`${API_BASE}/api/chat`, {
+        const response = await fetch(`${API}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            provider: currentProvider,
-            apiKey: currentProvider === 'ollama' ? undefined : config.apiKey,
-            baseURL,
-            model,
-            messages,
-            temperature: config.temperature,
-            maxTokens: config.maxTokens,
-            stream: false
+            provider: els.provider.value,
+            apiKey: els.apiKey.value || undefined,
+            model: els.model.value || undefined,
+            temperature: Number(els.temperature.value || 0.7),
+            maxTokens: Number(els.maxTokens.value || 1024),
+            systemPrompt: els.systemPrompt.value || undefined,
+            useKnowledgeBase: els.useKnowledgeBase.checked,
+            messages: state.messages
           })
         });
 
-        if (!res.ok) {
-          const err = await res.json();
-          assistantMsg.classList.remove('loading');
-          assistantMsg.classList.add('error');
-          assistantMsg.querySelector('.content').textContent = `Error: ${err.error || 'Unknown error'}`;
-          sendBtn.disabled = false;
-          sendBtn.innerHTML = '<span>Send</span><span>→</span>';
-          return;
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Chat request failed');
         }
 
-        const data = await res.json();
-        assistantMsg.classList.remove('loading');
-        
-        if (data.content) {
-          assistantMsg.querySelector('.content').textContent = data.content;
-          messages.push({ role: 'assistant', content: data.content });
-        } else if (data.error) {
-          assistantMsg.classList.add('error');
-          assistantMsg.querySelector('.content').textContent = `Error: ${data.error}`;
-        }
+        state.messages.push({ role: 'assistant', content: data.content || '(No response content)' });
       } catch (error) {
-        assistantMsg.classList.remove('loading');
-        assistantMsg.classList.add('error');
-        let errorMsg = `Error: ${error.message}`;
-        
-        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-          errorMsg = '❌ Cannot connect to server. Make sure the server is running.';
-        } else if (error.message.includes('All providers failed')) {
-          errorMsg = '❌ All AI providers failed. Check:\n• Ollama is running (http://localhost:11434)\n• API keys are configured for paid providers';
-        } else if (error.message.includes('ECONNREFUSED')) {
-          errorMsg = '❌ Connection refused. Is Ollama running?';
-        }
-        
-        assistantMsg.querySelector('.content').textContent = errorMsg;
+        state.messages.push({ role: 'assistant', content: `Error: ${error.message}` });
       }
 
-      sendBtn.disabled = false;
-      sendBtn.innerHTML = '<span>Send</span><span>→</span>';
+      setSending(false);
+      renderMessages();
+      persistState();
     }
 
-    function addMessage(role, content, streaming = false) {
-      const container = document.getElementById('chatContainer');
-      const div = document.createElement('div');
-      div.className = `message ${role}${streaming ? ' streaming' : ''}`;
-      div.innerHTML = `<span class="content">${content}</span>`;
-      container.appendChild(div);
-      container.scrollTop = container.scrollHeight;
-      return div;
+    async function runCompare(message) {
+      renderCompareLoading(message);
+      setSending(true);
+
+      const selected = Array.from(state.compareProviders);
+      if (selected.length === 0) {
+        renderEmpty('Select at least one provider for compare mode.');
+        setSending(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API}/api/compare`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message,
+            providers: selected,
+            temperature: Number(els.temperature.value || 0.7),
+            maxTokens: Number(els.maxTokens.value || 1024),
+            apiKeys: buildApiKeyMap(selected)
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Compare request failed');
+        }
+
+        renderCompareResults(message, data.results || []);
+      } catch (error) {
+        renderEmpty(`Compare error: ${error.message}`);
+      }
+
+      setSending(false);
+      persistState();
     }
 
-    loadModels();
+    function buildApiKeyMap(selectedProviders) {
+      const map = {};
+      if (els.apiKey.value) {
+        selectedProviders.forEach((provider) => {
+          map[provider] = els.apiKey.value;
+        });
+      }
+      return map;
+    }
+
+    function renderMessages() {
+      if (state.messages.length === 0) {
+        renderEmpty();
+        return;
+      }
+
+      els.feed.innerHTML = state.messages.map((msg) => {
+        const role = msg.role === 'user' ? 'user' : 'assistant';
+        const label = msg.role === 'user' ? 'You' : `${els.provider.value} � ${els.model.value || 'default'}`;
+        return `
+          <article class="bubble ${role}">
+            <div class="meta">${escapeHtml(label)}</div>
+            <div>${formatText(msg.content)}</div>
+          </article>
+        `;
+      }).join('');
+
+      scrollFeedToBottom();
+    }
+
+    function renderCompareLoading(message) {
+      els.feed.innerHTML = `
+        <div class="empty">Comparing providers for: <strong>${escapeHtml(message)}</strong></div>
+      `;
+    }
+
+    function renderCompareResults(message, results) {
+      const cards = results.map((item) => {
+        const ok = item.success === true;
+        const content = ok ? item.content : `Error: ${item.error || 'Unknown error'}`;
+        const duration = typeof item.duration === 'number' ? `${item.duration} ms` : '-';
+        return `
+          <article class="compare-card" style="border-left-color:${ok ? '#16a34a' : 'var(--red)'};">
+            <div class="compare-head">
+              <strong>${escapeHtml(item.provider || 'unknown')}</strong>
+              <span>${escapeHtml(duration)}</span>
+            </div>
+            <div>${formatText(content)}</div>
+          </article>
+        `;
+      }).join('');
+
+      els.feed.innerHTML = `
+        <div class="empty">Compared ${results.length} providers for: <strong>${escapeHtml(message)}</strong></div>
+        ${cards || '<div class="empty">No results returned.</div>'}
+      `;
+      scrollFeedToBottom();
+    }
+
+    function renderEmpty(text) {
+      const defaultText = state.mode === 'compare'
+        ? 'Select providers and send one prompt to compare outputs side by side.'
+        : 'Start a conversation with your selected provider.';
+      els.feed.innerHTML = `<div class="empty">${escapeHtml(text || defaultText)}</div>`;
+    }
+
+    function setSending(sending) {
+      els.sendBtn.disabled = sending;
+      els.sendBtn.textContent = sending ? 'Working...' : 'Send';
+    }
+
+    function scrollFeedToBottom() {
+      els.feed.scrollTop = els.feed.scrollHeight;
+    }
+
+    function formatText(text) {
+      return escapeHtml(String(text || '')).replace(/\n/g, '<br>');
+    }
+
+    function escapeHtml(input) {
+      return String(input)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      });
+    }
+
+    init();
   </script>
 </body>
 </html>
