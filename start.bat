@@ -1,10 +1,7 @@
 @echo off
-echo Starting Universal AI Adapter Server...
+echo Starting Universal AI Adapter...
 echo.
-echo Server running at http://localhost:3001
+echo Web UI: http://localhost:3000
 echo.
-echo Options:
-echo 1. Open http://localhost:3001 in browser
-echo 2. Press Ctrl+C to stop
-echo.
+start "" http://localhost:3000
 node server.js
