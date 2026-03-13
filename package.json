@@ -1,6 +1,6 @@
 {
     "name": "universal-ai-adapter",
-    "version": "1.7.2",
+    "version": "1.7.3",
     "description": "Universal AI adapter - One API for 15 providers (Ollama, Cerebras, OpenRouter, Qwen, Kimi, Mistral, Perplexity, Minimax, Z AI, OpenAI, Anthropic, Groq, DeepSeek, Gemini) with Compare All, fallback, streaming",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Ezekiel1214/universal-ai-adapter.git"
+        "url": "git+https://github.com/Ezekiel1214/universal-ai-adapter.git"
     },
     "homepage": "https://github.com/Ezekiel1214/universal-ai-adapter#readme",
     "bugs": {
@@ -31,7 +31,7 @@
         "nx:lint": "nx run universal-ai-adapter:lint",
         "nx:build:cli": "nx run universal-ai-adapter-cli:build",
         "nx:serve:server": "nx run universal-ai-adapter-server:serve",
-        "nx:typecheck": ".\\node_modules\\.bin\\tsc.cmd -p tsconfig.json --noEmit --pretty false",
+        "nx:typecheck": "tsc.cmd -p tsconfig.json --noEmit --pretty false",
         "nx:lint:providers": "nx run universal-ai-providers:lint",
         "nx:lint:shared": "nx run universal-ai-shared:lint",
         "nx:check:server": "nx run universal-ai-adapter-server:check"
@@ -91,7 +91,9 @@
     },
     "nx": {},
     "files": [
-        "dist/",
+        "dist/index.js",
+        "dist/index.d.ts",
+        "dist/libs/",
         "cli.mjs",
         "cli.cjs",
         "server.js",

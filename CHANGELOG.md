@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.3] - 2026-03-13
+
+### Fixed
+- Trimmed the npm package contents to the runtime entrypoints and compiled SDK files actually used at install time
+- Switched the repository metadata to the canonical git URL used by npm
+
 ## [1.7.2] - 2026-03-13
 
 ### Fixed
@@ -333,6 +339,7 @@ None yet (baseline).
 ## Bug Fixes
 
 None yet (first release).
+
 
 
 
