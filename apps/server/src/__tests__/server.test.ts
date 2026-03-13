@@ -1,7 +1,7 @@
-import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
-import { execFileSync, spawn, type ChildProcessByStdio } from 'child_process';
-import type { Readable } from 'stream';
+import { afterAll, beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { spawn, type ChildProcessByStdio } from 'child_process';
 import { once } from 'events';
+import type { Readable } from 'stream';
 
 interface ProvidersResponse {
   providers: Array<{ provider: string }>;
@@ -22,14 +22,21 @@ interface HealthResponse {
   features: unknown;
 }
 
-let serverProcess: ChildProcessByStdio<null, Readable, Readable>;
+let serverProcess: ChildProcessByStdio<null, Readable, Readable> | undefined;
 let baseUrl = '';
+
+jest.setTimeout(30000);
 
 async function waitForServerUrl(
   processRef: ChildProcessByStdio<null, Readable, Readable>,
 ): Promise<string> {
   return await new Promise((resolve, reject) => {
     let stderr = '';
+
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error(`Server did not start within timeout. ${stderr}`));
+    }, 15000);
 
     const handleStdout = (chunk: Buffer): void => {
       const output = chunk.toString();
@@ -50,6 +57,7 @@ async function waitForServerUrl(
     };
 
     const cleanup = (): void => {
+      clearTimeout(timer);
       processRef.stdout.off('data', handleStdout);
       processRef.stderr.off('data', handleStderr);
       processRef.off('exit', handleExit);
@@ -64,7 +72,13 @@ async function waitForServerUrl(
 beforeAll(async () => {
   serverProcess = spawn(process.execPath, ['server.js'], {
     cwd: process.cwd(),
-    env: { ...process.env, PORT: '0' },
+    env: {
+      ...process.env,
+      PORT: '0',
+      NODE_OPTIONS: '',
+      JEST_WORKER_ID: undefined,
+      TS_JEST: undefined,
+    },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 
@@ -72,10 +86,12 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  if (!serverProcess.killed) {
-    serverProcess.kill('SIGTERM');
-    await once(serverProcess, 'exit');
+  if (!serverProcess || serverProcess.exitCode !== null || serverProcess.killed) {
+    return;
   }
+
+  serverProcess.kill('SIGTERM');
+  await once(serverProcess, 'exit');
 });
 
 describe('server routes', () => {
