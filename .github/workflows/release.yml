@@ -53,10 +53,57 @@ jobs:
           npm version "${{ github.event.inputs.version }}" --no-git-tag-version
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "release_date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release notes
+        id: notes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.bump.outputs.version }}"
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            gh api "repos/${{ github.repository }}/releases/generate-notes" \
+              -f tag_name="$TAG" \
+              -f previous_tag_name="$PREVIOUS_TAG" \
+              --jq '.body' > RELEASE_NOTES.md
+          else
+            gh api "repos/${{ github.repository }}/releases/generate-notes" \
+              -f tag_name="$TAG" \
+              --jq '.body' > RELEASE_NOTES.md
+          fi
+
+      - name: Update CHANGELOG.md
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.bump.outputs.version }}
+          RELEASE_DATE: ${{ steps.bump.outputs.release_date }}
+        run: |
+          python <<'PY'
+          import os
+          from pathlib import Path
+
+          changelog_path = Path('CHANGELOG.md')
+          content = changelog_path.read_text(encoding='utf-8')
+          notes = Path('RELEASE_NOTES.md').read_text(encoding='utf-8').strip()
+          version = os.environ['RELEASE_VERSION']
+          release_date = os.environ['RELEASE_DATE']
+          section = f"## [{version}] - {release_date}\n\n{notes}\n\n"
+
+          marker = '## [Unreleased]\n\n'
+          if marker in content:
+              updated = content.replace(marker, marker + section, 1)
+          else:
+              updated = section + content
+
+          changelog_path.write_text(updated, encoding='utf-8')
+          PY
 
       - name: Commit release metadata
         run: |
-          git add package.json package-lock.json
+          git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): publish v${{ steps.bump.outputs.version }}"
           git tag "v${{ steps.bump.outputs.version }}"
 
@@ -70,5 +117,5 @@ jobs:
 
       - name: Create GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "v${{ steps.bump.outputs.version }}" --title "v${{ steps.bump.outputs.version }}" --notes "Release v${{ steps.bump.outputs.version }}"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "v${{ steps.bump.outputs.version }}" --title "v${{ steps.bump.outputs.version }}" --notes-file RELEASE_NOTES.md
