@@ -1,0 +1,131 @@
+name: Release Dry Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version bump type
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate CHANGELOG.md state
+        shell: bash
+        run: |
+          test -f CHANGELOG.md
+          if grep -q '<<<<<<<\|=======\|>>>>>>>' CHANGELOG.md; then
+            echo "CHANGELOG.md contains merge conflict markers."
+            exit 1
+          fi
+          if ! grep -q '^## \[Unreleased\]$' CHANGELOG.md; then
+            echo "CHANGELOG.md is missing the '## [Unreleased]' heading."
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test -- --runInBand
+
+      - name: Bump version
+        id: bump
+        shell: bash
+        run: |
+          npm version "${{ github.event.inputs.version }}" --no-git-tag-version
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "release_date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release notes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.bump.outputs.version }}"
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            gh api "repos/${{ github.repository }}/releases/generate-notes" \
+              -f tag_name="$TAG" \
+              -f previous_tag_name="$PREVIOUS_TAG" \
+              --jq '.body' > RELEASE_NOTES.md
+          else
+            gh api "repos/${{ github.repository }}/releases/generate-notes" \
+              -f tag_name="$TAG" \
+              --jq '.body' > RELEASE_NOTES.md
+          fi
+
+      - name: Update CHANGELOG.md
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.bump.outputs.version }}
+          RELEASE_DATE: ${{ steps.bump.outputs.release_date }}
+        run: |
+          python <<'PY'
+          import os
+          from pathlib import Path
+
+          changelog_path = Path('CHANGELOG.md')
+          content = changelog_path.read_text(encoding='utf-8')
+          notes = Path('RELEASE_NOTES.md').read_text(encoding='utf-8').strip()
+          version = os.environ['RELEASE_VERSION']
+          release_date = os.environ['RELEASE_DATE']
+          section = f"## [{version}] - {release_date}\n\n{notes}\n\n"
+
+          marker = '## [Unreleased]\n\n'
+          if marker not in content:
+              raise SystemExit("CHANGELOG.md must contain the exact '## [Unreleased]' section header followed by a blank line.")
+
+          updated = content.replace(marker, marker + section, 1)
+          changelog_path.write_text(updated, encoding='utf-8')
+          PY
+
+      - name: Verify npm tarball
+        shell: bash
+        run: npm pack --dry-run | tee PACK_OUTPUT.txt
+
+      - name: Capture release diff
+        shell: bash
+        run: |
+          git --no-pager diff -- package.json package-lock.json CHANGELOG.md > RELEASE_DIFF.patch
+          git --no-pager status --short > RELEASE_STATUS.txt
+
+      - name: Upload dry-run artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dry-run-v${{ steps.bump.outputs.version }}
+          path: |
+            RELEASE_NOTES.md
+            PACK_OUTPUT.txt
+            RELEASE_DIFF.patch
+            RELEASE_STATUS.txt
+            CHANGELOG.md
+            package.json
+            package-lock.json
