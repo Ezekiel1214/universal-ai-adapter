@@ -19,4 +19,5 @@ coverage/
 .nx-mcp-http.log
 .nx-mcp-http.err.log
 nul
+apps/server/src/*.d.ts
 

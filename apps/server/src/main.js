@@ -1060,7 +1060,13 @@ app.delete('/api/mcp/:serverName', (req, res) => {
   res.json({ success: true });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+export function startServer(port = PORT) {
+  return new Promise((resolve) => {
+    const server = app.listen(port, () => {
+      console.log(`Server running at http://localhost:${server.address().port}`);
+      resolve(server);
+    });
+  });
+}
 
+export { app, CONFIG, providerMetadata };

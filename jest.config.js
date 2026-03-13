@@ -16,10 +16,13 @@ export default {
   },
   testMatch: [
     '<rootDir>/libs/sdk/src/**/__tests__/**/*.test.ts',
-    '<rootDir>/libs/sdk/src/**/?(*.)+(spec|test).ts'
+    '<rootDir>/libs/sdk/src/**/?(*.)+(spec|test).ts',
+    '<rootDir>/apps/server/src/**/__tests__/**/*.test.ts',
+    '<rootDir>/apps/server/src/**/?(*.)+(spec|test).ts'
   ],
   collectCoverageFrom: [
     'libs/sdk/src/**/*.ts',
+    'apps/server/src/**/*.js',
     '!libs/sdk/src/**/*.d.ts',
     '!libs/sdk/src/index.ts'
   ],

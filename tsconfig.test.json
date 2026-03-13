@@ -1,4 +1,9 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["libs/sdk/src/**/*.test.ts", "libs/sdk/src/**/*.spec.ts"]
+  "include": [
+    "libs/sdk/src/**/*.test.ts",
+    "libs/sdk/src/**/*.spec.ts",
+    "apps/server/src/**/*.test.ts",
+    "apps/server/src/**/*.spec.ts"
+  ]
 }

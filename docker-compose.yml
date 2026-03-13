@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  universal-ai-adapter:
+    build: .
+    image: universal-ai-adapter:latest
+    container_name: universal-ai-adapter
+    ports:
+      - "3000:3000"
+    volumes:
+      - ai-adapter-data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Authentication (optional):
+      # - ENABLE_AUTH=true
+      # - API_KEY=your-secret-key
+      # Rate limiting (optional):
+      # - ENABLE_RATE_LIMIT=true
+      # - RATE_LIMIT_MAX=100
+      # - RATE_LIMIT_WINDOW=60000
+      # Uncomment and set your API keys:
+      # - OPENAI_API_KEY=sk-xxx
+      # - ANTHROPIC_API_KEY=sk-ant-xxx
+      # - GROQ_API_KEY=gsk_xxx
+      # - DEEPSEEK_API_KEY=xxx
+      # - GEMINI_API_KEY=xxx
+      # - CEREBRAS_API_KEY=xxx
+      # - OPENROUTER_API_KEY=xxx
+      # Proxy (optional):
+      # - HTTP_PROXY=http://proxy:8080
+      # - HTTPS_PROXY=http://proxy:8080
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-network
+
+volumes:
+  ai-adapter-data:
+    driver: local
+
+networks:
+  ai-network:
+    driver: bridge

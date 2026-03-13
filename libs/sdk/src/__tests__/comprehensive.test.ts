@@ -53,6 +53,9 @@ describe('Universal AI Adapter', () => {
     const endpoints = [
       { method: 'POST', path: '/api/chat' },
       { method: 'GET', path: '/api/models' },
+      { method: 'GET', path: '/api/providers' },
+      { method: 'GET', path: '/api/providers/:provider' },
+      { method: 'GET', path: '/api/providers/:provider/models' },
       { method: 'POST', path: '/api/providers/status' },
       { method: 'POST', path: '/api/compare' },
       { method: 'POST', path: '/api/knowledge/upload' },
@@ -66,6 +69,9 @@ describe('Universal AI Adapter', () => {
     test.each(endpoints)('should have $method $path endpoint', ({ method, path }) => {
       expect(method).toMatch(/^(GET|POST|PUT|DELETE)$/);
       expect(path).toMatch(/^\/api\//);
+      if (path.includes(':provider')) {
+        expect(path).toContain(':provider');
+      }
     });
   });
 
