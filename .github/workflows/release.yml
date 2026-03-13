@@ -79,13 +79,13 @@ jobs:
           echo "release_date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
 
       - name: Generate release notes
-        id: notes
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="v${{ steps.bump.outputs.version }}"
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          PREVIOUS_RELEASE_COMMIT=$(git log --grep='^chore(release): publish v' --format='%H' -n 1 || true)
 
           if [ -n "$PREVIOUS_TAG" ]; then
             gh api "repos/${{ github.repository }}/releases/generate-notes" \
@@ -96,6 +96,25 @@ jobs:
             gh api "repos/${{ github.repository }}/releases/generate-notes" \
               -f tag_name="$TAG" \
               --jq '.body' > RELEASE_NOTES.md
+          fi
+
+          if ! grep -q '^## What's Changed' RELEASE_NOTES.md && ! grep -q '^- ' RELEASE_NOTES.md; then
+            if [ -n "$PREVIOUS_RELEASE_COMMIT" ]; then
+              RANGE="$PREVIOUS_RELEASE_COMMIT..HEAD"
+            else
+              RANGE="HEAD~20..HEAD"
+            fi
+
+            COMMITS=$(git log $RANGE --no-merges --pretty=format:'- %s (%h)' | grep -v '^- chore(release): publish v' || true)
+            if [ -z "$COMMITS" ]; then
+              COMMITS='- No user-facing changes were detected in this release window.'
+            fi
+
+            cat > RELEASE_NOTES.md <<EOF
+## What's Changed
+
+$COMMITS
+EOF
           fi
 
       - name: Update CHANGELOG.md
