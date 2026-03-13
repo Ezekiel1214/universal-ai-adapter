@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.2] - 2026-03-13
+
+### Fixed
+- Rebuilt the Windows launcher executable so the download binary starts the web app instead of the legacy Ollama-only CLI
+- Aligned the Windows start scripts with the current `http://localhost:3000` app flow
+- Kept the published package metadata in sync with the latest patch release
+
 ## [1.7.0] - 2026-03-10
 
 ### Changed
@@ -326,6 +333,7 @@ None yet (baseline).
 ## Bug Fixes
 
 None yet (first release).
+
 
 
 
