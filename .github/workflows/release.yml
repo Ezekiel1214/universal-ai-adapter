@@ -35,6 +35,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate release secrets
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN secret is not configured."
+            exit 1
+          fi
+
+      - name: Validate CHANGELOG.md state
+        shell: bash
+        run: |
+          test -f CHANGELOG.md
+          if grep -q '<<<<<<<\|=======\|>>>>>>>' CHANGELOG.md; then
+            echo "CHANGELOG.md contains merge conflict markers."
+            exit 1
+          fi
+          if ! grep -q '^## \[Unreleased\]$' CHANGELOG.md; then
+            echo "CHANGELOG.md is missing the '## [Unreleased]' heading."
+            exit 1
+          fi
+
       - name: Build
         run: npm run build
 
@@ -93,11 +116,10 @@ jobs:
           section = f"## [{version}] - {release_date}\n\n{notes}\n\n"
 
           marker = '## [Unreleased]\n\n'
-          if marker in content:
-              updated = content.replace(marker, marker + section, 1)
-          else:
-              updated = section + content
+          if marker not in content:
+              raise SystemExit("CHANGELOG.md must contain the exact '## [Unreleased]' section header followed by a blank line.")
 
+          updated = content.replace(marker, marker + section, 1)
           changelog_path.write_text(updated, encoding='utf-8')
           PY
 
