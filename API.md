@@ -1,13 +1,17 @@
 # API Documentation
 
-Complete API reference for Universal AI Adapter v1.0.0
+Complete API reference for Universal AI Adapter v1.7.0
 
 ## Table of Contents
 
 - [UniversalAIAdapter](#universaiaiadapter)
+- [SmartAdapter](#smartadapter)
 - [Response Caching](#response-caching)
 - [Streaming](#streaming)
 - [Rate Limiting](#rate-limiting)
+- [Model Router](#model-router)
+- [Metrics & Dashboard](#metrics--dashboard)
+- [Server API Endpoints](#server-api-endpoints)
 - [Types & Interfaces](#types--interfaces)
 
 ---
@@ -32,6 +36,15 @@ interface AdapterOptions {
     groq?: string;
     deepseek?: string;
     ollama?: string;
+    localai?: string;
+    gemini?: string;
+    qwen?: string;
+    mistral?: string;
+    perplexity?: string;
+    minimax?: string;
+    zhipu?: string;
+    openrouter?: string;
+    cerebras?: string;
   };
   baseURLs?: {
     openai?: string;
@@ -39,10 +52,20 @@ interface AdapterOptions {
     groq?: string;
     deepseek?: string;
     ollama?: string;
+    localai?: string;
+    gemini?: string;
+    qwen?: string;
+    mistral?: string;
+    perplexity?: string;
+    minimax?: string;
+    zhipu?: string;
+    openrouter?: string;
+    cerebras?: string;
   };
   preferredProvider?: AIProvider;
   fallbackChain?: AIProvider[];
   verbose?: boolean;
+  proxy?: string;
 }
 ```
 
@@ -712,3 +735,4 @@ import type {
 ## License
 
 MIT License - see LICENSE file for details.
+

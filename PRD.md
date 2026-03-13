@@ -1,7 +1,7 @@
 # Universal AI Adapter - Product Requirements Document (PRD)
 
-**Version:** 1.1.0  
-**Date:** February 26, 2026  
+**Version:** 1.7.0  
+**Date:** March 1, 2026  
 **Status:** Production Ready
 
 ---
@@ -9,7 +9,7 @@
 ## 1. Executive Summary
 
 ### Purpose
-Universal AI Adapter is a TypeScript library that provides a unified interface for integrating multiple AI providers (OpenAI, Anthropic, Groq, DeepSeek, Ollama) with automatic fallback, caching, rate limiting, retry logic, and streaming support.
+Universal AI Adapter is a TypeScript library that provides a unified interface for 14 AI providers (Ollama, LocalAI, Cerebras, OpenRouter, Qwen, Mistral, Perplexity, Minimax, Z AI, OpenAI, Anthropic, Groq, DeepSeek, Gemini) with automatic fallback, caching, rate limiting, retry logic, and streaming support. It also includes a Web UI with Compare All feature and Custom Agents.
 
 ### Problem Statement
 Developers face significant complexity when integrating multiple AI providers:
@@ -18,9 +18,11 @@ Developers face significant complexity when integrating multiple AI providers:
 - Manual error handling and retry logic
 - No unified TypeScript types
 - Difficult to switch providers for cost/performance optimization
+- No easy way to compare responses across providers
+- Need for custom AI agents with specific behaviors
 
 ### Solution
-A single, type-safe TypeScript library that abstracts all provider differences and provides production-grade features out of the box.
+A single, type-safe TypeScript library that abstracts all provider differences and provides production-grade features out of the box, plus a complete Web UI for non-technical users.
 
 ---
 
@@ -31,6 +33,8 @@ A single, type-safe TypeScript library that abstracts all provider differences a
 - **Node.js Backend Engineers** needing unified AI integration
 - **Startup Teams** wanting to avoid vendor lock-in
 - **Enterprise Developers** requiring reliability and fallback capabilities
+- **Researchers** comparing AI model responses
+- **Non-technical users** wanting to chat with multiple AIs
 
 ### Technical Requirements
 - Node.js 18+
@@ -64,14 +68,27 @@ A single, type-safe TypeScript library that abstracts all provider differences a
 | **Streaming Support** | Real-time response streaming | Required |
 | **Model Router** | Intelligent provider selection | Optional |
 
-### 3.3 Future Features (Roadmap)
+### 3.3 Web UI Features (v1.7.0)
+
+| Feature | Description | Priority |
+|---------|-------------|----------|
+| **Compare All** | Compare multiple AI responses side-by-side | Required |
+| **Provider Selection** | Select which providers to compare | Required |
+| **Custom Agents** | Define purpose, instructions, tone, guardrails | Required |
+| **Knowledge Base** | Upload documents for RAG queries | Required |
+| **VPN/Proxy** | Route traffic through proxy | Required |
+| **Voice Input/Output** | F1/F2 keys for voice | Required |
+| **Dashboard** | Analytics and usage tracking | Required |
+| **Tools/Skills/MCPs** | Select tools for AI agents | Required |
+
+### 3.4 Future Features (Roadmap)
 
 | Feature | Description | Target |
 |---------|-------------|--------|
-| **Token Usage Dashboard** | Visual usage tracking | v1.2.0 |
-| **Azure OpenAI** | Azure-specific provider | v1.2.0 |
-| **Google Gemini** | Gemini provider support | v1.3.0 |
+| **Multi-agent orchestration** | Multiple agents working together | v2.0.0 |
 | **Custom Plugins** | User-defined providers | v2.0.0 |
+| **Browser Extension** | Chrome/Firefox extension | v2.1.0 |
+| **Desktop App** | Electron desktop application | v2.2.0 |
 
 ---
 
@@ -80,24 +97,31 @@ A single, type-safe TypeScript library that abstracts all provider differences a
 ### 4.1 Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│           UniversalAIAdapter                 │
-├─────────────────────────────────────────────┤
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐    │
-│  │ Cache   │  │ Rate    │  │ Retry   │    │
-│  │ Layer   │  │ Limiter │  │ Handler │    │
-│  └─────────┘  └─────────┘  └─────────┘    │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐    │
-│  │Circuit  │  │ Stream  │  │ Model   │    │
-│  │Breaker  │  │ Manager │  │ Router  │    │
-│  └─────────┘  └─────────┘  └─────────┘    │
-├─────────────────────────────────────────────┤
-│  ┌─────────────────────────────────────┐   │
-│  │       Provider Layer                │   │
-│  ├──────┬──────┬──────┬──────┬───────┤   │
-│  │OpenAI│Claude│Groq │Deepseek│Ollama│   │
-│  └──────┴──────┴──────┴──────┴───────┘   │
-└─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    Universal AI Adapter                      │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐      │
+│  │  Cache  │  │  Rate   │  │  Retry  │  │Circuit  │      │
+│  │  Layer  │  │ Limiter │  │ Handler │  │Breaker  │      │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘      │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐      │
+│  │Streaming│  │ Metrics │  │  Model  │  │  Voice  │      │
+│  │ Manager │  │         │  │ Router  │  │ Support │      │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘      │
+├─────────────────────────────────────────────────────────────┤
+│                    Provider Layer                             │
+│  ┌──────┬──────┬──────┬───────┬──────┬───────┬──────┐   │
+│  │OpenAI│Claude│ Groq │DeepSeek│Ollama│LocalAI│Gemini│   │
+│  └──────┴──────┴──────┴───────┴──────┴───────┴──────┘   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│                      Web UI Layer                             │
+│  ┌──────────┐  ┌───────────┐  ┌────────────┐  ┌────────┐ │
+│  │Simple    │  │ Compare   │  │  Custom    │  │Dashboard│ │
+│  │Chat      │  │   All     │  │  Agents    │  │        │ │
+│  └──────────┘  └───────────┘  └────────────┘  └────────┘ │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### 4.2 Supported Providers
@@ -105,45 +129,39 @@ A single, type-safe TypeScript library that abstracts all provider differences a
 | Provider | API Type | Streaming | Tool Calling | Free Tier |
 |----------|----------|-----------|--------------|-----------|
 | OpenAI | OpenAI SDK | ✅ | ✅ | ❌ |
-| Anthropic | Anthropic SDK | ❌ | ✅ | ❌ |
+| Anthropic | Anthropic SDK | ✅ | ✅ | ❌ |
 | Groq | OpenAI SDK | ✅ | ✅ | ✅ |
 | DeepSeek | OpenAI SDK | ✅ | ✅ | ✅ |
 | Ollama | HTTP | ❌ | ❌ | ✅ |
+| LocalAI | HTTP | ✅ | ✅ | ✅ |
+| Gemini | Google SDK | ✅ | ✅ | ✅ |
+| Qwen | OpenAI SDK | ✅ | ✅ | ✅ |
 
-### 4.3 Dependencies
+### 4.3 Supported Models
+
+| Provider | Models |
+|----------|--------|
+| **OpenAI** | gpt-5.2, o1, o1-mini, o4-mini |
+| **Anthropic** | claude-sonnet-4-6, claude-opus-4-6, claude-haiku-3-5 |
+| **Groq** | llama-3.3-70b, llama-3.1-70b, mixtral-8x7b |
+| **DeepSeek** | deepseek-chat, deepseek-coder-v2, deepseek-v4 (coming) |
+| **Ollama** | llama3.3, llama3.2, mistral, codellama, phi4 |
+| **LocalAI** | llama3.3, mistral, gemma2 |
+| **Gemini** | gemini-3.1-pro, gemini-3-flash, gemini-2.5-pro, gemini-2.5-flash |
+| **Qwen** | qwen3-235b-a22b, qwen3-30b-a3b, qwen3-8b-plus, qwen2.5 |
+
+### 4.4 Dependencies
 
 **Production:**
 - `openai@^4.20.0` - OpenAI, Groq, DeepSeek SDK
 - `@anthropic-ai/sdk@^0.27.0` - Anthropic SDK
-- `axios@^1.7.0` - HTTP client for Ollama
+- `axios@^1.7.0` - HTTP client for Ollama, LocalAI
 
 **Development:**
 - TypeScript 5.3+
 - Jest 29+
 - ESLint 8+
 - Nx 22+
-
-### 4.4 Package Structure
-
-```
-dist/
-├── index.js / .d.ts       # Main exports
-├── adapter.js / .d.ts     # Core adapter
-├── types.js / .d.ts       # TypeScript types
-├── cache.js / .d.ts      # Caching
-├── streaming.js / .d.ts   # Streaming
-├── rate-limit.js / .d.ts # Rate limiting
-├── metrics.js / .d.ts    # Metrics
-├── smart-adapter.js      # Smart adapter
-├── model-router.js       # Model router
-└── providers/
-    ├── base.js / .d.ts
-    ├── openai.js / .d.ts
-    ├── anthropic.js / .d.ts
-    ├── ollama.js / .d.ts
-    ├── groq.js / .d.ts
-    └── deepseek.js / .d.ts
-```
 
 ---
 
@@ -182,14 +200,18 @@ class SmartAdapter {
 ### 5.3 Configuration Types
 
 ```typescript
+type AIProvider = 'openai' | 'anthropic' | 'groq' | 'deepseek' | 'ollama' | 'localai' | 'gemini' | 'none';
+
 interface UniversalAIConfig {
-  provider: 'openai' | 'anthropic' | 'groq' | 'deepseek' | 'ollama' | 'none';
+  provider: AIProvider;
   providers?: {
     openai?: { apiKey: string; model?: string; baseURL?: string };
     anthropic?: { apiKey: string; model?: string };
     groq?: { apiKey: string; model?: string };
     deepseek?: { apiKey: string; model?: string };
     ollama?: { baseURL?: string; model?: string };
+    localai?: { baseURL?: string; model?: string };
+    gemini?: { apiKey: string; model?: string };
   };
   enableFallback?: boolean;
   fallbackOrder?: AIProvider[];
@@ -200,66 +222,131 @@ interface UniversalAIConfig {
 
 ---
 
-## 6. Non-Functional Requirements
+## 6. Server API Specification
 
-### 6.1 Performance
+### 6.1 REST Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/chat` | POST | Unified chat for all 14 providers |
+| `/api/models` | GET | Get available models per provider |
+| `/api/providers/status` | POST | Check provider health |
+| `/api/compare` | POST | Compare all providers simultaneously |
+| `/api/knowledge/upload` | POST | Upload knowledge base files |
+| `/api/knowledge/query` | POST | Query knowledge base |
+| `/api/knowledge/files` | GET | List knowledge files |
+| `/api/dashboard` | GET | Analytics and metrics |
+| `/api/dashboard/track` | POST | Track usage |
+
+### 6.2 One API for All Providers
+
+The unified API allows switching providers without code changes:
+
+```javascript
+// Same interface for all 14 providers!
+POST /api/chat
+{
+  "provider": "cerebras", // or ollama, openai, anthropic, etc.
+  "apiKey": "...",
+  "messages": [{"role": "user", "content": "Hello"}]
+}
+
+// Compare ALL at once!
+POST /api/compare
+{
+  "message": "What is AI?",
+  "providers": ["ollama", "qwen", "openai", "anthropic", "groq", "deepseek", "gemini"],
+  "apiKeys": { "openai": "sk-...", "anthropic": "sk-ant-..." }
+}
+```
+
+---
+
+## 7. Web UI Specification
+
+### 6.1 Views
+
+1. **Simple Chat** - Single AI chat interface
+2. **Compare All** - Multi-provider comparison
+3. **Custom Agent** - Agent configuration
+4. **Dashboard** - Analytics and metrics
+
+### 6.2 Compare All Feature
+
+- Checkbox selection for each provider
+- Real-time status indicators
+- Side-by-side response cards
+- Scrollable content areas
+
+### 6.3 Custom Agent Configuration
+
+- **Purpose** - What the agent should do
+- **Instructions** - Detailed behavior guidelines
+- **Tone** - Professional, Friendly, Humorous, Technical
+- **Guardrails** - Constraints and restrictions
+- **Knowledge Base** - Uploaded documents for context
+
+---
+
+## 8. Non-Functional Requirements
+
+### 7.1 Performance
 - **Latency:** < 50ms overhead for adapter routing
 - **Memory:** < 10MB base footprint
 - **Bundle Size:** < 100KB gzipped
 
-### 6.2 Reliability
+### 7.2 Reliability
 - **Uptime:** 99.9% (excluding provider outages)
 - **Error Handling:** Graceful degradation with fallback
 - **Circuit Breaker:** Prevents cascading failures
 
-### 6.3 Security
+### 7.3 Security
 - No telemetry or data collection
 - API keys never logged or exposed
 - Support for environment variable configuration
+- VPN/Proxy support for privacy
 
-### 6.4 Compatibility
+### 7.4 Compatibility
 - Node.js 18, 20, 21
 - TypeScript 5.3+
 - ESM modules
 
 ---
 
-## 7. Success Metrics
+## 8. Success Metrics
 
-### 7.1 Adoption
+### 8.1 Adoption
 - NPM downloads per month
 - GitHub stars
 - Number of contributors
 
-### 7.2 Quality
+### 8.2 Quality
 - Test coverage: > 80%
 - Zero critical bugs
 - < 48hr response to issues
 
-### 7.3 Performance
+### 8.3 Performance
 - Average response time
 - Cache hit rate
 - Fallback success rate
 
 ---
 
-## 8. Release Plan
+## 9. Release Plan
 
-### v1.1.0 (Current)
-- Streaming support
-- Model router integration
-- Integration tests
-- CI with coverage
+### v1.7.0 (Current)
+- ✅ 7 AI Providers (added Gemini)
+- ✅ Compare All feature
+- ✅ Custom Agents
+- ✅ Knowledge Base
+- ✅ VPN/Proxy support
+- ✅ Voice Input/Output
+- ✅ Dashboard
+- ✅ Tools/Skills/MCPs
 
-### v1.2.0 (Q2 2026)
-- Token usage dashboard
-- Azure OpenAI provider
-- Bug fixes and improvements
-
-### v1.3.0 (Q3 2026)
-- Google Gemini provider
-- Performance optimizations
-- Extended documentation
+### v1.3.0 (Q2 2026)
+- Multi-agent orchestration
+- Browser extension prototype
 
 ### v2.0.0 (Q4 2026)
 - Custom provider plugins
@@ -267,39 +354,36 @@ interface UniversalAIConfig {
 
 ---
 
-## 9. Risk Analysis
-
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Provider API changes | High | Abstraction layer allows quick updates |
-| SDK version conflicts | Medium | Peer dependencies with version ranges |
-| Security vulnerabilities | High | Regular audits, dependency updates |
-| Maintenance burden | Medium | Clear documentation, community contributions |
-
----
-
 ## 10. Competitor Analysis
 
-| Feature | This Library | LangChain | Raw SDKs |
-|---------|-------------|-----------|----------|
-| Setup Time | 2 min | 30+ min | Per provider |
-| Fallback | ✅ Built-in | ❌ Manual | ❌ None |
-| Type Safety | ✅ Full TS | ⚠️ Partial | ✅ Full |
-| Bundle Size | ~50KB | ~500KB | ~20KB each |
-| Free Option | ✅ Ollama | ❌ | Depends |
-| Learning Curve | Low | High | Medium |
+| Feature | This Library | LangChain | LiteLLM | AiSuite |
+|---------|-------------|-----------|---------|---------|
+| Setup Time | 2 min | 30+ min | 10 min | 5 min |
+| Fallback | ✅ Built-in | ❌ Manual | ✅ Built-in | ❌ |
+| Type Safety | ✅ Full TS | ⚠️ Partial | ❌ None | ❌ |
+| Bundle Size | ~50KB | ~500KB | ~100KB | ~80KB |
+| Free Option | ✅ Ollama | ❌ | ✅ Ollama | ✅ Ollama |
+| Compare All | ✅ Built-in | ❌ | ❌ | ❌ |
+| Custom Agents | ✅ Built-in | ✅ | ❌ | ❌ |
+| Web UI | ✅ Built-in | ❌ | ❌ | ❌ |
+| VPN/Proxy | ✅ Built-in | ❌ | ❌ | ❌ |
 
 ---
 
 ## 11. Conclusion
 
-Universal AI Adapter provides a production-ready solution for multi-provider AI integration. With automatic fallback, caching, rate limiting, and streaming support, it addresses the key challenges developers face when building AI-powered applications.
+Universal AI Adapter provides a production-ready solution for multi-provider AI integration. With automatic fallback, caching, rate limiting, streaming support, Compare All feature, and Custom Agents, it addresses the key challenges developers face when building AI-powered applications.
 
-The library is available on NPM and ready for production use.
+The library is available on NPM and ready for production use. The Web UI makes it accessible to non-technical users who want to compare AI responses or create custom AI agents.
 
 **Get Started:**
 ```bash
 npm install universal-ai-adapter
+npm run start
 ```
 
-**Documentation:** https://github.com/anomalyco/universal-ai-adapter#readme
+**Web UI:** http://localhost:3000
+
+**Documentation:** https://github.com/Ezekiel1214/universal-ai-adapter#readme
+
+

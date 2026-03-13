@@ -7,13 +7,94 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
-- Token usage tracking dashboard
-- Azure OpenAI provider
-- Google Gemini provider
-- Custom provider plugins
-- Anthropic streaming support
-- Ollama streaming support
+## [1.7.0] - 2026-03-10
+
+### Changed
+- Migrated the codebase into an Nx workspace with `apps/` and `libs/`
+- Modernized and simplified the primary web workspace UI
+- Updated repository metadata and docs to the Ezekiel1214 GitHub repo
+
+### Added
+- Unified API metadata test coverage
+- Refresh of installer, download, and container collateral
+
+## [1.6.0] - 2026-03-01
+
+### Added
+- **14 AI Providers** - Added 2 new free providers:
+  - **Cerebras** - Free API with llama-3.3-70b, llama-3.1-70b
+  - **OpenRouter** - Free API with meta-llama, deepseek-r1, mistral-large
+- **Streaming for ALL Providers** - All 14 providers now support streaming
+- **New Tools** - Added 5 more tools (was 5, now 10):
+  - Code Runner, Image Gen, DateTime, URL Fetch, JSON Parse
+- **Enhanced Web UI** - Modern dark theme with animations
+- **Free Provider Badges** - Visual indicators for free providers
+- **CLI Enhanced** - stream, status, models, compare commands
+
+### Updated
+- All documentation (README, download page, API docs)
+- Package version to 1.6.0
+- Fallback order with new providers
+
+## [1.5.0] - 2026-02-28
+
+### Added
+- **12 AI Providers** - Added Z AI (GLM-5)
+  - Z AI (zhipu) with glm-5 model
+  - Latest GLM models: glm-5, glm-4-flash, glm-4-plus
+- Updated all documentation
+
+## [1.3.1] - 2026-02-28
+
+### Fixed
+- Ollama model name (llama3.2:latest)
+- Duplicate JavaScript declarations in web UI
+- API endpoint auto-detection
+- Compare All endpoint for new providers
+
+### Added
+- **11 AI Providers** - Added 3 new providers:
+  - Mistral (mistral-large-latest)
+  - Perplexity (llama-3.1-sonar-small-128k-online)
+  - Minimax (MiniMax-Text-01)
+- Qwen provider to sidebar list
+- Upload button for knowledge base files
+- All 11 providers in UI
+- Download page updates with alternative AI tools
+
+## [1.3.0] - 2026-02-27
+
+### Added
+- **8 AI Providers** - Added Qwen as the 8th provider
+  - Ollama, LocalAI, Qwen, Gemini, OpenAI, Anthropic, Groq, DeepSeek
+  - Updated model lists with latest versions (GPT-5.2, Claude 4.6, Qwen3, Gemini 3, etc.)
+- **One API for All Providers** - Unified `/api/chat` endpoint
+  - Same interface works with all 8 providers
+  - Provider switching without code changes
+- **Compare All API** - `/api/compare` endpoint
+  - Compare responses from multiple providers simultaneously
+  - Returns duration, tokens, success/failure per provider
+- **Dashboard API** - `/api/dashboard` and `/api/dashboard/track`
+  - Analytics and usage metrics
+  - Per-provider statistics
+  - Token tracking and cost estimation
+- **Compare All Feature** - Side-by-side multi-provider comparison
+  - Checkbox selection for each provider
+  - Real-time status tracking per provider
+  - Scrollable response cards
+- **Custom Agents** - Define purpose, instructions, tone, guardrails
+- **VPN/Proxy Support** - Toggle in sidebar
+- **Voice Input/Output** - F1/F2 keyboard shortcuts
+- **Tools/Skills/MCPs** - Select tools for AI agents
+- **Web UI Enhancements**
+  - Modern dark theme
+  - Provider status indicators
+  - Markdown rendering
+
+### Infrastructure
+- Express server with REST API (9 endpoints)
+- Updated `/api/models` with all 8 providers
+- Knowledge base endpoints (upload, query, list)
 
 ## [1.1.0] - 2026-02-26
 
@@ -245,3 +326,7 @@ None yet (baseline).
 ## Bug Fixes
 
 None yet (first release).
+
+
+
+

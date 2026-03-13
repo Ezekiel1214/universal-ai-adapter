@@ -1,566 +1,376 @@
 # Universal AI Adapter
 
-> A unified TypeScript library for integrating multiple AI providers with automatic fallback support.
+> A unified TypeScript library for integrating multiple AI providers with automatic fallback, Compare All feature, and Custom Agents.
 
 [![npm version](https://img.shields.io/npm/v/universal-ai-adapter.svg)](https://www.npmjs.com/package/universal-ai-adapter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Test Status](https://img.shields.io/badge/tests-39%20passed-brightgreen)](https://github.com/anomalyco/universal-ai-adapter)
 
 ## Features
 
+### Core Features
 ✅ **Unified Interface** - One API for all providers  
+✅ **15 AI Providers** - Ollama, LocalAI, Cerebras, OpenRouter, Qwen, Kimi, Mistral, Perplexity, Minimax, Z AI, OpenAI, Anthropic, Groq, DeepSeek, Gemini  
 ✅ **Automatic Fallback** - Seamlessly switch providers on failure  
 ✅ **Type Safe** - Full TypeScript support  
 ✅ **Response Caching** - Built-in caching with multiple presets  
 ✅ **Rate Limiting** - Per-provider rate limit management  
 ✅ **Retry Logic** - Exponential backoff with jitter  
 ✅ **Circuit Breaker** - Prevent cascading failures  
-✅ **Streaming Support** - Real-time response streaming  
+✅ **Streaming Support** - Real-time response streaming for ALL providers  
 ✅ **Model Router** - Intelligent provider selection  
-✅ **Zero Config** - Works with environment variables  
-✅ **Local-First** - Free Ollama support out of the box  
-✅ **Tool Calling** - Function calling support where available
+
+### Advanced Features
+✅ **Compare All** - Compare responses from multiple AIs side-by-side  
+✅ **Provider Selection** - Select which providers to compare  
+✅ **Custom Agents** - Define purpose, instructions, tone, guardrails  
+✅ **Knowledge Base** - Upload documents for RAG-style queries  
+✅ **VPN/Proxy Support** - Route traffic through proxy for privacy  
+✅ **Voice Input/Output** - Use F1/F2 keys for voice  
+✅ **Dashboard** - Analytics and usage tracking  
+✅ **Tools/Skills/MCPs** - Select tools for AI agents  
+✅ **Web UI** - Modern chat interface  
+✅ **CLI Tool** - Command-line interface  
 
 ## Supported Providers
 
-| Provider | Status | Streaming | Tool Calling | Free Tier |
-|----------|--------|-----------|--------------|-----------|
-| **Ollama** | ✅ | ❌ | ❌ | ✅ Free (Local) |
-| **OpenAI** | ✅ | ✅ | ✅ | ❌ Paid |
-| **Anthropic** | ✅ | ✅ | ✅ | ❌ Paid |
-| **Groq** | ✅ | ✅ | ✅ | ✅ Free Tier |
-| **DeepSeek** | ✅ | ✅ | ✅ | ✅ Budget |
+| Provider | Status | Streaming | Free Tier | Latest Models |
+|----------|--------|-----------|-----------|---------------|
+| **Ollama** | ✅ | ✅ | ✅ Free (Local) | llama3.3, mistral, codellama |
+| **LocalAI** | ✅ | ✅ | ✅ Free (Local) | llama3.3, mistral, gemma2 |
+| **Cerebras** | ✅ | ✅ | ✅ Free (API) | llama-3.3-70b, llama-3.1-70b |
+| **OpenRouter** | ✅ | ✅ | ✅ Free (API) | llama-3.3-70b, deepseek-r1 |
+| **Qwen** | ✅ | ✅ | ✅ Free (API) | qwen3-235b-a22b, qwen3-30b-a3b |
+| **Kimi** | ✅ | ✅ | ✅ Free (API) | kimi-k2.5, kimi-k2, kimi-k1.5 |
+| **Mistral** | ✅ | ✅ | ✅ Free | mistral-large-latest, mistral-small |
+| **Perplexity** | ✅ | ✅ | ✅ Free | sonar-small, sonar-large |
+| **Minimax** | ✅ | ✅ | ✅ Budget | MiniMax-Text-01 |
+| **Z AI** | ✅ | ✅ | ✅ Free | glm-5, glm-4-flash |
+| **OpenAI** | ✅ | ✅ | ❌ Paid | gpt-5.2, o1, o1-mini |
+| **Anthropic** | ✅ | ✅ | ❌ Paid | claude-sonnet-4-6, claude-opus-4-6 |
+| **Groq** | ✅ | ✅ | ✅ Free | llama-3.3-70b, mixtral-8x7b |
+| **DeepSeek** | ✅ | ✅ | ✅ Budget | deepseek-chat, deepseek-coder-v2 |
+| **Gemini** | ✅ | ✅ | ✅ Free | gemini-3.1-pro, gemini-3-flash |
 
-## Installation
+## Quick Start
+
+### 1. Web UI (Recommended)
+
+```bash
+# Start the server
+npm run start
+
+# Open in browser
+http://localhost:3000
+```
+
+### 2. Use as NPM Package
 
 ```bash
 npm install universal-ai-adapter
 ```
 
-### Peer Dependencies
-
-```bash
-# For OpenAI, Groq, DeepSeek (all use OpenAI SDK)
-npm install openai
-
-# For Anthropic
-npm install @anthropic-ai/sdk
-
-# For HTTP requests (Ollama)
-npm install axios
-```
-
-## CLI (Executable)
-
-Download `universal-ai-adapter.exe` from the releases page, or build it yourself:
-
-```bash
-# Build the exe
-npm install -g pkg
-pkg cli.cjs --targets node18-win-x64 --output universal-ai-adapter.exe
-```
-
-### CLI Usage
-
-```bash
-# Check Ollama status
-universal-ai-adapter.exe status http://localhost:11434
-
-# Chat with Ollama
-universal-ai-adapter.exe chat http://localhost:11434 llama3.2 "Hello!"
-```
-
-**Note:** The CLI only supports Ollama. For all providers, use the npm package.
-
-## Quick Start
-
-### 1. Basic Usage (Free with Ollama)
-
 ```typescript
 import { UniversalAIAdapter } from 'universal-ai-adapter';
 
 const adapter = new UniversalAIAdapter({
   provider: 'ollama',
   providers: {
-    ollama: {
-      baseURL: 'http://localhost:11434',
-      model: 'llama3.2'
-    }
+    ollama: { baseURL: 'http://localhost:11434', model: 'llama3.2' }
   }
 });
 
-const response = await adapter.simpleChat(
-  'Explain quantum computing in one sentence',
-  'You are a helpful assistant'
-);
-
-console.log(response); // AI response
+const response = await adapter.simpleChat('Hello!');
+console.log(response);
 ```
 
-### 2. With Automatic Fallback
+### 3. CLI
 
-```typescript
-const adapter = new UniversalAIAdapter({
-  provider: 'openai', // Primary
-  enableFallback: true,
-  fallbackOrder: ['groq', 'ollama'], // Try these if OpenAI fails
-  providers: {
-    openai: {
-      apiKey: process.env.OPENAI_API_KEY,
-      model: 'gpt-4-turbo-preview'
-    },
-    groq: {
-      apiKey: process.env.GROQ_API_KEY,
-      model: 'llama-3.1-70b-versatile'
-    },
-    ollama: {
-      baseURL: 'http://localhost:11434',
-      model: 'llama3.2'
-    }
-  }
-});
+```bash
+# Install globally
+npm install -g universal-ai-adapter
 
-// Will try OpenAI → Groq → Ollama automatically
-const response = await adapter.chat({
-  messages: [
-    { role: 'system', content: 'You are a code expert' },
-    { role: 'user', content: 'Write a sorting function in Python' }
-  ],
-  temperature: 0.7
-});
-
-console.log(response.content);
-console.log(response.provider); // Which provider was actually used
-console.log(response.isFallback); // true if not primary provider
+# Run
+universal-ai-adapter --prompt "Hello"
 ```
 
-### 3. Environment-Based Configuration
+## Web UI Features
 
-```typescript
-// .env file
-AI_PROVIDER=ollama
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=llama3.2
+### Simple Chat
+- Select from ALL available models in one dropdown
+- Provider status indicators
+- Markdown support with syntax highlighting
+- Loading states and typing indicators
+
+### Compare All
+- Compare responses from multiple AI providers simultaneously
+- Select/deselect which providers to include
+- Real-time status tracking per provider
+- Side-by-side comparison view
+- Scrollable response cards
+
+### Custom Agent
+- Define agent **purpose** and **instructions**
+- Set **tone** (Professional, Friendly, Humorous, Technical)
+- Add **guardrails** (No medical advice, stay on topic, etc.)
+- Upload **knowledge base** documents for RAG
+- VPN/Proxy toggle for privacy
+
+### Tools/Skills/MCPs
+- Select available tools for AI agents
+- MCP server configuration
+- Function calling support
+- Custom skill definitions
+
+### Voice Features
+- **F1** - Voice input (hold to speak)
+- **F2** - Voice output (read responses aloud)
+
+### Dashboard
+- Token usage tracking
+- Cost analytics
+- Provider performance metrics
+- Request history
+
+### Navigation
+- Home/Landing page
+- Simple Chat view
+- Compare All view
+- Custom Agent view
+- Settings panel
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# API Keys
 OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
 GROQ_API_KEY=gsk_...
+DEEPSEEK_API_KEY=...
+GEMINI_API_KEY=...
+CEREBRAS_API_KEY=...
+OPENROUTER_API_KEY=...
+KIMI_API_KEY=...
 
-// Code
-import { UniversalAIAdapter } from 'universal-ai-adapter';
+# Ollama (optional)
+OLLAMA_BASE_URL=http://localhost:11434
 
-const adapter = new UniversalAIAdapter({
-  provider: (process.env.AI_PROVIDER as any) || 'ollama',
-  enableFallback: true,
-  verbose: true, // Log provider switches
-  providers: {
-    openai: {
-      apiKey: process.env.OPENAI_API_KEY!,
-      model: 'gpt-4-turbo-preview'
-    },
-    groq: {
-      apiKey: process.env.GROQ_API_KEY!
-    },
-    ollama: {
-      baseURL: process.env.OLLAMA_BASE_URL,
-      model: process.env.OLLAMA_MODEL
-    }
-  }
-});
+# Proxy (optional)
+HTTP_PROXY=https://proxy:8080
+HTTPS_PROXY=https://proxy:8080
+
+# Server Configuration (optional)
+PORT=3000
+ENABLE_AUTH=true              # Require API key for access
+API_KEY=your-secret-key      # Custom API key
+ENABLE_RATE_LIMIT=true       # Enable rate limiting (default: true)
+RATE_LIMIT_MAX=100            # Max requests per window (default: 100)
+RATE_LIMIT_WINDOW=60000        # Window in ms (default: 60000 = 1 min)
 ```
 
-### 4. With Tool/Function Calling
+### Authentication
 
-```typescript
-const tools = [
-  {
-    type: 'function' as const,
-    function: {
-      name: 'get_weather',
-      description: 'Get current weather for a location',
-      parameters: {
-        type: 'object',
-        properties: {
-          location: {
-            type: 'string',
-            description: 'City name'
-          }
-        },
-        required: ['location']
-      }
-    }
-  }
-];
-
-const response = await adapter.chat({
-  messages: [
-    { role: 'user', content: 'What\'s the weather in London?' }
-  ],
-  tools
-});
-
-if (response.toolCalls && response.toolCalls.length > 0) {
-  const toolCall = response.toolCalls[0];
-  console.log('Function:', toolCall.function.name);
-  console.log('Arguments:', JSON.parse(toolCall.function.arguments));
-  // { location: "London" }
-}
-```
-
-### 5. With Streaming
-
-```typescript
-const adapter = new UniversalAIAdapter({
-  provider: 'openai',
-  providers: {
-    openai: { apiKey: process.env.OPENAI_API_KEY }
-  }
-});
-
-// Check if streaming is supported
-if (adapter.supportsStreaming()) {
-  for await (const chunk of adapter.stream({
-    messages: [{ role: 'user', content: 'Count to 5' }]
-  })) {
-    process.stdout.write(chunk.content);
-  }
-}
-```
-
-## API Reference
-
-### Constructor
-
-```typescript
-new UniversalAIAdapter(config: UniversalAIConfig)
-```
-
-**Config Options:**
-
-```typescript
-interface UniversalAIConfig {
-  provider: 'openai' | 'anthropic' | 'groq' | 'deepseek' | 'ollama' | 'none';
-  providers?: {
-    openai?: { apiKey: string; model?: string; baseURL?: string };
-    anthropic?: { apiKey: string; model?: string };
-    groq?: { apiKey: string; model?: string };
-    deepseek?: { apiKey: string; model?: string };
-    ollama?: { baseURL?: string; model?: string };
-  };
-  enableFallback?: boolean; // Default: true
-  fallbackOrder?: AIProvider[]; // Default: ['ollama', 'groq', 'openai', 'anthropic', 'deepseek']
-  verbose?: boolean; // Default: false
-  timeout?: number; // Default: 60000ms
-}
-```
-
-### Methods
-
-#### `chat(request: ChatRequest): Promise<ChatResponse>`
-
-Send a chat request.
-
-```typescript
-const response = await adapter.chat({
-  messages: [
-    { role: 'system', content: 'You are helpful' },
-    { role: 'user', content: 'Hello!' }
-  ],
-  tools: [], // Optional
-  temperature: 0.7, // Optional (0-1)
-  maxTokens: 2000 // Optional
-});
-```
-
-**Response:**
-
-```typescript
-interface ChatResponse {
-  content: string;
-  toolCalls?: ToolCall[];
-  provider: AIProvider;
-  model: string;
-  usage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-  };
-  isFallback?: boolean; // true if not primary provider
-}
-```
-
-#### `simpleChat(prompt, systemPrompt?, options?): Promise<string>`
-
-Simplified chat interface.
-
-```typescript
-const answer = await adapter.simpleChat(
-  'Explain TypeScript',
-  'You are a teacher',
-  { temperature: 0.5, maxTokens: 500 }
-);
-```
-
-#### `getProviderStatuses(): Promise<ProviderStatus[]>`
-
-Check health of all providers.
-
-```typescript
-const statuses = await adapter.getProviderStatuses();
-// [
-//   { provider: 'openai', available: true, model: 'gpt-4' },
-//   { provider: 'ollama', available: true, model: 'llama3.2' }
-// ]
-```
-
-#### `getCurrentProvider()`
-
-Get current active provider.
-
-```typescript
-const info = adapter.getCurrentProvider();
-// { provider: 'openai', model: 'gpt-4-turbo-preview', available: true }
-```
-
-#### `switchProvider(provider: AIProvider)`
-
-Manually switch provider.
-
-```typescript
-adapter.switchProvider('groq');
-```
-
-## Use Cases
-
-### 1. Cost Optimization
-
-```typescript
-// Use free Ollama for dev, paid APIs for production
-const adapter = new UniversalAIAdapter({
-  provider: process.env.NODE_ENV === 'production' ? 'openai' : 'ollama',
-  providers: { /* ... */ }
-});
-```
-
-### 2. Reliability
-
-```typescript
-// Never go down - automatic fallback chain
-const adapter = new UniversalAIAdapter({
-  provider: 'openai',
-  enableFallback: true,
-  fallbackOrder: ['anthropic', 'groq', 'ollama']
-});
-```
-
-### 3. Privacy-First
-
-```typescript
-// Keep sensitive data local with Ollama
-const adapter = new UniversalAIAdapter({
-  provider: 'ollama',
-  enableFallback: false // Never send to cloud
-});
-```
-
-### 4. Multi-Model Ensemble
-
-```typescript
-// Get responses from multiple models
-const providers: AIProvider[] = ['openai', 'anthropic', 'groq'];
-const responses = await Promise.all(
-  providers.map(p => {
-    adapter.switchProvider(p);
-    return adapter.simpleChat('Explain AI safety');
-  })
-);
-```
-
-## Error Handling
-
-```typescript
-import { AIAdapterError } from 'universal-ai-adapter';
-
-try {
-  const response = await adapter.chat({ messages });
-} catch (error) {
-  if (error instanceof AIAdapterError) {
-    console.error(`Provider ${error.provider} failed:`, error.message);
-    console.error('Cause:', error.cause);
-  }
-}
-```
-
-## Setup Ollama (Free)
+When `ENABLE_AUTH=true`, all API requests require an API key:
 
 ```bash
-# 1. Install Ollama
-curl -fsSL https://ollama.com/install.sh | sh
+# Via header (recommended)
+curl -H "X-API-Key: your-secret-key" http://localhost:3000/api/chat
 
-# 2. Pull a model (one-time, ~2GB)
-ollama pull llama3.2
-
-# 3. Start server
-ollama serve
-
-# 4. Use with adapter
-const adapter = new UniversalAIAdapter({
-  provider: 'ollama',
-  providers: {
-    ollama: {
-      baseURL: 'http://localhost:11434',
-      model: 'llama3.2'
-    }
-  }
-});
-```
-
-## Express.js Integration
-
-```typescript
-import express from 'express';
-import { UniversalAIAdapter } from 'universal-ai-adapter';
-
-const app = express();
-app.use(express.json());
-
-const adapter = new UniversalAIAdapter({
-  provider: 'ollama',
-  enableFallback: true
-});
-
-app.post('/api/chat', async (req, res) => {
-  try {
-    const response = await adapter.chat({
-      messages: req.body.messages
-    });
-    res.json(response);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.listen(3000);
-```
-
-## Testing
-
-```typescript
-// Mock provider for tests
-const adapter = new UniversalAIAdapter({
-  provider: 'none', // No real provider
-  enableFallback: false
-});
-
-// Or use Ollama for integration tests (free)
-const adapter = new UniversalAIAdapter({
-  provider: 'ollama'
-});
-```
-
-## Comparison
-
-| Feature | This Library | LangChain | Raw SDK |
-|---------|-------------|-----------|---------|
-| Setup Time | 2 min | 30 min | Per provider |
-| Fallback | ✅ Built-in | ❌ Manual | ❌ None |
-| Type Safety | ✅ Full | ⚠️ Partial | ✅ Full |
-| Bundle Size | ~50KB | ~500KB | ~20KB |
-| Free Option | ✅ Ollama | ❌ | Depends |
-
-## Advanced Features
-
-See [API.md](API.md) for complete documentation.
-
-### Response Caching
-
-```typescript
-import { ResponseCache, CachePresets } from 'universal-ai-adapter';
-
-const cache = new ResponseCache(CachePresets.production);
-
-// Check cache before making request
-let response = cache.get(messages);
-if (!response) {
-  response = await adapter.chat({ messages });
-  cache.set(messages, response, 'openai', 'gpt-4');
-}
-
-console.log('Cache stats:', cache.getStats());
+# Via query parameter
+curl http://localhost:3000/api/chat?apiKey=your-secret-key
 ```
 
 ### Rate Limiting
 
-```typescript
-import { RateLimiter } from 'universal-ai-adapter';
+Rate limiting is enabled by default (100 requests per minute). Check your remaining quota:
 
-const limiter = new RateLimiter();
+```bash
+# Get rate limit status
+curl http://localhost:3000/api/rate-limit/status
 
-// Wait for available slot
-await limiter.waitForSlot('openai');
-limiter.recordRequest('openai');
-
-try {
-  const response = await adapter.chat({ messages });
-  return response;
-} finally {
-  limiter.recordCompletion('openai');
-}
+# Response:
+# { "remaining": 95, "resetTime": 1234567890, "limit": 100 }
 ```
 
-### Retry with Exponential Backoff
+### Programmatic Configuration
 
 ```typescript
-import { RetryHandler } from 'universal-ai-adapter';
-
-const retry = new RetryHandler({
-  maxRetries: 3,
-  initialDelay: 1000,
-  backoffMultiplier: 2
-});
-
-const response = await retry.execute(async () => {
-  return await adapter.chat({ messages });
-}, 'Chat Request');
-```
-
-### Circuit Breaker
-
-```typescript
-import { CircuitBreaker } from 'universal-ai-adapter';
-
-const breaker = new CircuitBreaker();
-
-if (!breaker.isOpen('openai')) {
-  try {
-    const response = await adapter.chat({ messages });
-    breaker.recordSuccess('openai');
-  } catch (error) {
-    breaker.recordFailure('openai');
-    throw error;
+const adapter = new UniversalAIAdapter({
+  provider: 'openai',
+  providers: {
+    ollama: { baseURL: 'http://localhost:11434', model: 'llama3.3' },
+    qwen: { apiKey: process.env.QWEN_API_KEY, model: 'qwen3-235b-a22b' },
+    openai: { apiKey: process.env.OPENAI_API_KEY, model: 'gpt-5.2' },
+    anthropic: { apiKey: process.env.ANTHROPIC_API_KEY, model: 'claude-sonnet-4-6' },
+    groq: { apiKey: process.env.GROQ_API_KEY, model: 'llama-3.3-70b' },
+    deepseek: { apiKey: process.env.DEEPSEEK_API_KEY, model: 'deepseek-chat' },
+    gemini: { apiKey: process.env.GEMINI_API_KEY, model: 'gemini-3.1-pro' }
+  },
+  fallbackOrder: ['ollama', 'qwen', 'groq', 'gemini', 'openai', 'anthropic', 'deepseek'],
+  
+  // Advanced options
+  cache: {
+    enabled: true,
+    ttl: 1000 * 60 * 60, // 1 hour
+    maxSize: 100
+  },
+  rateLimit: {
+    enabled: true,
+    maxRequests: 100,
+    windowMs: 60 * 1000 // 1 minute
+  },
+  retry: {
+    maxRetries: 3,
+    baseDelay: 1000
+  },
+  circuitBreaker: {
+    enabled: true,
+    failureThreshold: 5,
+    resetTimeout: 30 * 1000
   }
-}
+});
 ```
 
-## Roadmap
+## API Reference
 
-- [x] Streaming support
-- [x] Response caching
-- [x] Rate limiting
-- [x] Retry logic with exponential backoff
-- [x] Circuit breaker pattern
-- [ ] Token usage tracking dashboard
-- [ ] Model router (auto-select based on task)
-- [ ] Azure OpenAI support
-- [ ] Google Gemini support
-- [ ] Custom provider plugins
+### `UniversalAIAdapter`
+
+#### Constructor
+```typescript
+new UniversalAIAdapter(config: UniversalAIConfig)
+```
+
+#### Methods
+
+| Method | Description |
+|--------|-------------|
+| `chat(request)` | Send a chat request |
+| `stream(request)` | Stream responses (if supported) |
+| `simpleChat(message)` | Simple single-message chat |
+| `getProviderStatuses()` | Check all provider statuses |
+
+### Server API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/chat` | POST | Send chat message (any provider) |
+| `/api/models` | GET | Get available models (14 providers) |
+| `/api/providers/status` | POST | Check provider status |
+| `/api/compare` | POST | Compare ALL providers at once |
+| `/api/knowledge/upload` | POST | Upload knowledge base file |
+| `/api/knowledge/query` | POST | Query knowledge base |
+| `/api/knowledge/files` | GET | List knowledge files |
+| `/api/knowledge/files/:filename` | GET | Get single file content |
+| `/api/knowledge/files/:filename` | PUT | Update file content |
+| `/api/knowledge/files/:filename` | DELETE | Delete a file |
+| `/api/knowledge/clear` | DELETE | Clear all knowledge files |
+| `/api/dashboard` | GET | Analytics & metrics |
+| `/api/dashboard/track` | POST | Track usage |
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Build
+npm run build
+
+# Test
+npm test
+
+# Start server
+npm run start
+
+# Build CLI
+npm run build:cli
+```
+
+## Docker
+
+```bash
+# Build
+docker build -t universal-ai-adapter .
+
+# Run
+docker run -p 3000:3000 universal-ai-adapter
+```
+
+## Use Cases
+
+### 1. Multi-Provider Comparison
+Compare responses from GPT-4, Claude, Gemini, and local Ollama models to find the best answer for your specific use case.
+
+### 2. Cost Optimization
+Route requests through free providers (Ollama, Groq, Gemini) for development and testing, switch to premium for production.
+
+### 3. Reliability & Fallback
+Automatically fall back to alternative providers when your primary provider experiences issues.
+
+### 4. Local-First Development
+Use Ollama for free local development without API costs, then deploy with cloud providers.
+
+### 5. Custom AI Agents
+Create specialized agents with custom instructions, tone, and guardrails for specific tasks.
+
+### 6. Knowledge-Augmented AI
+Upload documents to create a knowledge base for RAG-style queries.
+
+## Project Structure
+
+```
+universal-ai-adapter/
+├── src/
+│   ├── index.ts          # Main exports
+│   ├── adapter.ts        # Core adapter
+│   ├── types.ts          # TypeScript types
+│   ├── cache.ts         # Caching
+│   ├── rate-limit.ts    # Rate limiting & circuit breaker
+│   ├── streaming.ts     # Streaming utilities
+│   ├── metrics.ts       # Analytics & metrics
+│   ├── model-router.ts  # Intelligent routing
+│   ├── smart-adapter.ts # Advanced adapter
+│   └── providers/       # Provider implementations
+│       ├── openai.ts
+│       ├── anthropic.ts
+│       ├── groq.ts
+│       ├── deepseek.ts
+│       ├── ollama.ts
+│       ├── localai.ts
+│       └── gemini.ts
+├── web/public/          # Web UI
+│   ├── index.html       # Unified chat interface
+│   └── landing.html     # Landing page
+├── download/            # Download website
+│   └── index.html
+├── server.js            # Express server
+├── cli.cjs              # CLI tool
+└── package.json
+```
+
+## Comparison with Alternatives
+
+| Feature | Universal AI Adapter | LangChain | LiteLLM | AiSuite |
+|---------|---------------------|-----------|---------|---------|
+| Providers | 15 | 100+ | 100+ | 10+ |
+| Setup Time | 2 min | 30+ min | 10 min | 5 min |
+| Fallback | ✅ Built-in | ❌ Manual | ✅ Built-in | ❌ |
+| Type Safety | ✅ Full TS | ⚠️ Partial | ❌ None | ❌ |
+| Bundle Size | ~50KB | ~500KB | ~100KB | ~80KB |
+| Free Options | Yes | No | Yes | Yes |
+| Compare All | ✅ Built-in | ❌ | ❌ | ❌ |
+| Custom Agents | ✅ Built-in | ✅ | ❌ | ❌ |
+| Web UI | ✅ Built-in | ❌ | ❌ | ❌ |
+| VPN/Proxy | ✅ Built-in | ❌ | ❌ | ❌ |
 
 ## License
 
-MIT
+MIT License - See LICENSE file for details.
 
-## Contributing
+## Support
 
-PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
+- [GitHub Issues](https://github.com/Ezekiel1214/universal-ai-adapter/issues)
+- [NPM Package](https://www.npmjs.com/package/universal-ai-adapter)
 
----
 
-**Made with ❤️ for developers who want AI without the complexity**
