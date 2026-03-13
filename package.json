@@ -1,125 +1,123 @@
 {
-    "name":  "universal-ai-adapter",
-    "version":  "1.7.3",
-    "description":  "Universal AI adapter - One API for 15 providers (Ollama, Cerebras, OpenRouter, Qwen, Kimi, Mistral, Perplexity, Minimax, Z AI, OpenAI, Anthropic, Groq, DeepSeek, Gemini) with Compare All, fallback, streaming",
-    "main":  "dist/index.js",
-    "types":  "dist/index.d.ts",
-    "type":  "module",
-    "bin":  {
-                "ai-adapter":  "cli.mjs"
-            },
-    "repository":  {
-                       "type":  "git",
-                       "url":  "git+https://github.com/Ezekiel1214/universal-ai-adapter.git"
-                   },
-    "homepage":  "https://github.com/Ezekiel1214/universal-ai-adapter#readme",
-    "bugs":  {
-                 "url":  "https://github.com/Ezekiel1214/universal-ai-adapter/issues"
-             },
-    "scripts":  {
-                    "build":  "npm run clean \u0026\u0026 tsc",
-                    "build:cli":  "tsc apps/cli/src/main.ts --outDir dist/apps/cli --esModuleInterop --module NodeNext --moduleResolution NodeNext --target ES2022 --skipLibCheck",
-                    "test":  "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-                    "test:coverage":  "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-                    "dev":  "tsc --watch",
-                    "prepublishOnly":  "npm run build",
-                    "cli":  "node cli.cjs",
-                    "server":  "node server.js",
-                    "start":  "node server.js",
-                    "nx:build":  "nx run universal-ai-adapter:build",
-                    "nx:test":  "nx run universal-ai-adapter:test",
-                    "nx:lint":  "nx run universal-ai-adapter:lint",
-                    "nx:build:cli":  "nx run universal-ai-adapter-cli:build",
-                    "nx:serve:server":  "nx run universal-ai-adapter-server:serve",
-                    "nx:typecheck":  "tsc.cmd -p tsconfig.json --noEmit --pretty false",
-                    "nx:lint:providers":  "nx run universal-ai-providers:lint",
-                    "nx:lint:shared":  "nx run universal-ai-shared:lint",
-                    "nx:check:server":  "nx run universal-ai-adapter-server:check",
-                    "clean":  "node -e \"require(\u0027fs\u0027).rmSync(\u0027dist\u0027,{recursive:true,force:true});try{require(\u0027fs\u0027).rmSync(\u0027.tsbuildinfo\u0027,{force:true})}catch{}\""
-                },
-    "keywords":  [
-                     "ai",
-                     "llm",
-                     "openai",
-                     "anthropic",
-                     "ollama",
-                     "groq",
-                     "deepseek",
-                     "gemini",
-                     "qwen",
-                     "adapter",
-                     "universal",
-                     "chatgpt",
-                     "claude",
-                     "compare",
-                     "multi-provider",
-                     "fallback",
-                     "streaming",
-                     "cli",
-                     "web-ui"
-                 ],
-    "author":  "",
-    "license":  "MIT",
-    "dependencies":  {
-                         "@anthropic-ai/sdk":  "^0.27.3",
-                         "axios":  "^1.13.5",
-                         "express":  "^5.2.1",
-                         "inquirer":  "^9.3.8",
-                         "openai":  "^4.104.0"
-                     },
-    "devDependencies":  {
-                            "@nx/eslint":  "^22.5.4",
-                            "@nx/jest":  "^22.5.4",
-                            "@types/express-serve-static-core":  "^5.1.1",
-                            "@types/jest":  "^29.5.0",
-                            "@types/node":  "^20.10.0",
-                            "@typescript-eslint/eslint-plugin":  "^8.57.0",
-                            "@typescript-eslint/parser":  "^8.57.0",
-                            "eslint":  "^8.50.0",
-                            "jest":  "^29.7.0",
-                            "nx":  "^22.5.4",
-                            "nx-mcp":  "^0.23.0",
-                            "ts-jest":  "^29.1.0",
-                            "typescript":  "^5.3.0"
-                        },
-    "peerDependenciesMeta":  {
-                                 "openai":  {
-                                                "optional":  true
-                                            },
-                                 "@anthropic-ai/sdk":  {
-                                                           "optional":  true
-                                                       }
-                             },
-    "nx":  {
-
-           },
-    "files":  [
-                  "dist/index.js",
-                  "dist/index.d.ts",
-                  "dist/libs/",
-                  "cli.mjs",
-                  "cli.cjs",
-                  "server.js",
-                  "apps/server/src/main.js",
-                  "web/public/",
-                  "README.md",
-                  "LICENSE"
-              ],
-    "overrides":  {
-                      "eslint":  {
-                                     "minimatch":  "3.1.4"
-                                 },
-                      "@eslint/eslintrc":  {
-                                               "minimatch":  "3.1.4"
-                                           },
-                      "@humanwhocodes/config-array":  {
-                                                          "minimatch":  "3.1.4"
-                                                      },
-                      "glob":  {
-                                   "minimatch":  "3.1.4"
-                               },
-                      "test-exclude":  {
-                                           "minimatch":  "3.1.4"
-                                       }
-                  }
+    "name": "universal-ai-adapter",
+    "version": "1.7.4",
+    "description": "Universal AI adapter - One API for 15 providers (Ollama, Cerebras, OpenRouter, Qwen, Kimi, Mistral, Perplexity, Minimax, Z AI, OpenAI, Anthropic, Groq, DeepSeek, Gemini) with Compare All, fallback, streaming",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "bin": {
+        "ai-adapter": "cli.mjs"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Ezekiel1214/universal-ai-adapter.git"
+    },
+    "homepage": "https://github.com/Ezekiel1214/universal-ai-adapter#readme",
+    "bugs": {
+        "url": "https://github.com/Ezekiel1214/universal-ai-adapter/issues"
+    },
+    "scripts": {
+        "build": "npm run clean && tsc",
+        "build:cli": "tsc apps/cli/src/main.ts --outDir dist/apps/cli --esModuleInterop --module NodeNext --moduleResolution NodeNext --target ES2022 --skipLibCheck",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+        "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+        "dev": "tsc --watch",
+        "prepublishOnly": "npm run build",
+        "cli": "node cli.cjs",
+        "server": "node server.js",
+        "start": "node server.js",
+        "nx:build": "nx run universal-ai-adapter:build",
+        "nx:test": "nx run universal-ai-adapter:test",
+        "nx:lint": "nx run universal-ai-adapter:lint",
+        "nx:build:cli": "nx run universal-ai-adapter-cli:build",
+        "nx:serve:server": "nx run universal-ai-adapter-server:serve",
+        "nx:typecheck": "tsc.cmd -p tsconfig.json --noEmit --pretty false",
+        "nx:lint:providers": "nx run universal-ai-providers:lint",
+        "nx:lint:shared": "nx run universal-ai-shared:lint",
+        "nx:check:server": "nx run universal-ai-adapter-server:check",
+        "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true});try{require('fs').rmSync('.tsbuildinfo',{force:true})}catch{}\""
+    },
+    "keywords": [
+        "ai",
+        "llm",
+        "openai",
+        "anthropic",
+        "ollama",
+        "groq",
+        "deepseek",
+        "gemini",
+        "qwen",
+        "adapter",
+        "universal",
+        "chatgpt",
+        "claude",
+        "compare",
+        "multi-provider",
+        "fallback",
+        "streaming",
+        "cli",
+        "web-ui"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "@anthropic-ai/sdk": "^0.27.3",
+        "axios": "^1.13.5",
+        "express": "^5.2.1",
+        "inquirer": "^9.3.8",
+        "openai": "^4.104.0"
+    },
+    "devDependencies": {
+        "@nx/eslint": "^22.5.4",
+        "@nx/jest": "^22.5.4",
+        "@types/express-serve-static-core": "^5.1.1",
+        "@types/jest": "^29.5.0",
+        "@types/node": "^20.10.0",
+        "@typescript-eslint/eslint-plugin": "^8.57.0",
+        "@typescript-eslint/parser": "^8.57.0",
+        "eslint": "^8.50.0",
+        "jest": "^29.7.0",
+        "nx": "^22.5.4",
+        "nx-mcp": "^0.23.0",
+        "ts-jest": "^29.1.0",
+        "typescript": "^5.3.0"
+    },
+    "peerDependenciesMeta": {
+        "openai": {
+            "optional": true
+        },
+        "@anthropic-ai/sdk": {
+            "optional": true
+        }
+    },
+    "nx": {},
+    "files": [
+        "dist/index.js",
+        "dist/index.d.ts",
+        "dist/libs/",
+        "cli.mjs",
+        "cli.cjs",
+        "server.js",
+        "apps/server/src/main.js",
+        "web/public/",
+        "README.md",
+        "LICENSE"
+    ],
+    "overrides": {
+        "eslint": {
+            "minimatch": "3.1.4"
+        },
+        "@eslint/eslintrc": {
+            "minimatch": "3.1.4"
+        },
+        "@humanwhocodes/config-array": {
+            "minimatch": "3.1.4"
+        },
+        "glob": {
+            "minimatch": "3.1.4"
+        },
+        "test-exclude": {
+            "minimatch": "3.1.4"
+        }
+    }
 }

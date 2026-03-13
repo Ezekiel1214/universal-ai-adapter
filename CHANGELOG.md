@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.4] - 2026-03-14
+
+## What's Changed
+
+- refactor(ci): move release logic into scripts (167e8b8)
+- feat(ci): add repository dispatch release triggers (6a1ee75)
+- fix(ci): harden release notes generation (c9c9e9f)
+- feat(ci): improve release notes fallback (d108783)
+- feat(ci): add dry-run release workflow (374d7d0)
+- chore(ci): validate release prerequisites (b44aeb7)
+- feat(ci): generate changelog in release workflow (6226371)
+- chore(ci): harden release and clean build workflow (38eefc2)
+
+**Full Changelog**: https://github.com/Ezekiel1214/universal-ai-adapter/compare/081719227f864cf29ae9e57297c9e075772ff824...v1.7.4
+
 ## [1.7.3] - 2026-03-13
 
 ### Fixed
