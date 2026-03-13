@@ -21,8 +21,6 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      RELEASE_BUMP: ${{ github.event.inputs.version || github.event.client_payload.version }}
 
     steps:
       - name: Checkout
@@ -47,10 +45,6 @@ jobs:
         run: |
           if [ -z "$NODE_AUTH_TOKEN" ]; then
             echo "NPM_TOKEN secret is not configured."
-            exit 1
-          fi
-          if [ -z "$RELEASE_BUMP" ]; then
-            echo "Release bump type was not provided."
             exit 1
           fi
 
@@ -81,74 +75,29 @@ jobs:
       - name: Bump version
         id: bump
         shell: bash
+        env:
+          WORKFLOW_BUMP: ${{ github.event.inputs.version }}
+          DISPATCH_BUMP: ${{ github.event.client_payload.version }}
         run: |
+          RELEASE_BUMP="$WORKFLOW_BUMP"
+          if [ -z "$RELEASE_BUMP" ]; then
+            RELEASE_BUMP="$DISPATCH_BUMP"
+          fi
+          if [ -z "$RELEASE_BUMP" ]; then
+            echo "Release bump type was not provided."
+            exit 1
+          fi
+
           npm version "$RELEASE_BUMP" --no-git-tag-version
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "release_date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
 
       - name: Generate release notes
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG="v${{ steps.bump.outputs.version }}"
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
-          PREVIOUS_RELEASE_COMMIT=$(git log --grep='^chore(release): publish v' --format='%H' -n 1 || true)
-
-          if [ -n "$PREVIOUS_TAG" ]; then
-            gh api "repos/${{ github.repository }}/releases/generate-notes" \
-              -f tag_name="$TAG" \
-              -f previous_tag_name="$PREVIOUS_TAG" \
-              --jq '.body' > RELEASE_NOTES.md
-          else
-            gh api "repos/${{ github.repository }}/releases/generate-notes" \
-              -f tag_name="$TAG" \
-              --jq '.body' > RELEASE_NOTES.md
-          fi
-
-          if ! grep -q "^## What's Changed" RELEASE_NOTES.md && ! grep -q '^- ' RELEASE_NOTES.md; then
-            if [ -n "$PREVIOUS_RELEASE_COMMIT" ]; then
-              COMMITS=$(git log "$PREVIOUS_RELEASE_COMMIT"..HEAD --no-merges --pretty=format:'- %s (%h)' | grep -v '^- chore(release): publish v' || true)
-            else
-              COMMITS=$(git log -n 20 --no-merges --pretty=format:'- %s (%h)' | grep -v '^- chore(release): publish v' || true)
-            fi
-
-            if [ -z "$COMMITS" ]; then
-              COMMITS='- No user-facing changes were detected in this release window.'
-            fi
-
-            cat > RELEASE_NOTES.md <<EOF
-## What's Changed
-
-$COMMITS
-EOF
-          fi
+        run: node scripts/release/generate-release-notes.mjs "${{ steps.bump.outputs.version }}" RELEASE_NOTES.md
 
       - name: Update CHANGELOG.md
-        shell: bash
-        env:
-          RELEASE_VERSION: ${{ steps.bump.outputs.version }}
-          RELEASE_DATE: ${{ steps.bump.outputs.release_date }}
-        run: |
-          python <<'PY'
-          import os
-          from pathlib import Path
-
-          changelog_path = Path('CHANGELOG.md')
-          content = changelog_path.read_text(encoding='utf-8')
-          notes = Path('RELEASE_NOTES.md').read_text(encoding='utf-8').strip()
-          version = os.environ['RELEASE_VERSION']
-          release_date = os.environ['RELEASE_DATE']
-          section = f"## [{version}] - {release_date}\n\n{notes}\n\n"
-
-          marker = '## [Unreleased]\n\n'
-          if marker not in content:
-              raise SystemExit("CHANGELOG.md must contain the exact '## [Unreleased]' section header followed by a blank line.")
-
-          updated = content.replace(marker, marker + section, 1)
-          changelog_path.write_text(updated, encoding='utf-8')
-          PY
+        run: node scripts/release/update-changelog.mjs "${{ steps.bump.outputs.version }}" "${{ steps.bump.outputs.release_date }}" RELEASE_NOTES.md CHANGELOG.md
 
       - name: Commit release metadata
         run: |
