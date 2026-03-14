@@ -103,10 +103,23 @@ jobs:
         run: |
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): publish v${{ steps.bump.outputs.version }}"
-          git tag "v${{ steps.bump.outputs.version }}"
+          git tag -a "v${{ steps.bump.outputs.version }}" -m "v${{ steps.bump.outputs.version }}"
 
       - name: Push branch and tag
-        run: git push origin master --follow-tags
+        run: git push origin master "refs/tags/v${{ steps.bump.outputs.version }}"
+
+      - name: Wait for remote tag
+        shell: bash
+        run: |
+          TAG="refs/tags/v${{ steps.bump.outputs.version }}"
+          for attempt in {1..12}; do
+            if git ls-remote --exit-code --tags origin "$TAG" >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Tag $TAG was not visible on origin after push."
+          exit 1
 
       - name: Publish to npm
         run: npm publish
