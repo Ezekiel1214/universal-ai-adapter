@@ -21,3 +21,6 @@ coverage/
 nul
 apps/server/src/*.d.ts
 
+
+RELEASE_NOTES.md
+
