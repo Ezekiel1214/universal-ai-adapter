@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: universal-ai-adapter
+    runtime: docker
+    plan: free
+    branch: master
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
