@@ -1,50 +1,27 @@
-import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, test, expect } from '@jest/globals';
+import { UnifiedAIService } from '../unified-api';
 
 describe('Universal AI Adapter', () => {
-  
   describe('Provider Configuration', () => {
-    test('should have 14 providers configured', () => {
-      const providers = [
-        'ollama', 'localai', 'cerebras', 'openrouter',
-        'qwen', 'mistral', 'perplexity', 'minimax',
-        'zhipu', 'gemini', 'openai', 'anthropic', 'groq', 'deepseek'
-      ];
-      expect(providers.length).toBe(14);
+    test('should expose all providers from metadata', () => {
+      const providers = UnifiedAIService.listProviders().map((provider) => provider.provider);
+
+      expect(providers.length).toBe(15);
+      expect(providers).toContain('kimi');
     });
 
     test('should have valid provider names', () => {
-      const validProviders = [
-        'ollama', 'localai', 'cerebras', 'openrouter',
-        'qwen', 'mistral', 'perplexity', 'minimax',
-        'zhipu', 'gemini', 'openai', 'anthropic', 'groq', 'deepseek'
-      ];
-      validProviders.forEach(p => {
-        expect(p).toMatch(/^[a-z]+$/);
+      UnifiedAIService.listProviders().forEach((provider) => {
+        expect(provider.provider).toMatch(/^[a-z]+$/);
       });
     });
   });
 
   describe('Model Lists', () => {
     test('should have models for each provider', () => {
-      const models: Record<string, string[]> = {
-        openai: ['gpt-5.2', 'o1', 'o1-mini'],
-        anthropic: ['claude-sonnet-4-6', 'claude-opus-4-6'],
-        groq: ['llama-3.3-70b', 'mixtral-8x7b'],
-        deepseek: ['deepseek-chat', 'deepseek-reasoner'],
-        qwen: ['qwen3-235b-a22b', 'qwen3-30b-a3b'],
-        mistral: ['mistral-large-latest', 'mistral-small-latest'],
-        perplexity: ['llama-3.1-sonar-small-128k-online'],
-        minimax: ['MiniMax-Text-01'],
-        zhipu: ['glm-5', 'glm-4-flash'],
-        openrouter: ['meta-llama/llama-3.3-70b-instruct'],
-        cerebras: ['llama-3.3-70b'],
-        gemini: ['gemini-2.0-flash', 'gemini-2.5-pro']
-      };
-
-      Object.keys(models).forEach(provider => {
-        expect(models[provider]).toBeDefined();
-        expect(Array.isArray(models[provider])).toBe(true);
-        expect(models[provider].length).toBeGreaterThan(0);
+      UnifiedAIService.listProviders().forEach((provider) => {
+        expect(Array.isArray(provider.models)).toBe(true);
+        expect(provider.models.length).toBeGreaterThan(0);
       });
     });
   });
@@ -63,7 +40,7 @@ describe('Universal AI Adapter', () => {
       { method: 'GET', path: '/api/knowledge/files' },
       { method: 'GET', path: '/api/dashboard' },
       { method: 'GET', path: '/api/tools' },
-      { method: 'POST', path: '/api/tools/execute' }
+      { method: 'POST', path: '/api/tools/execute' },
     ];
 
     test.each(endpoints)('should have $method $path endpoint', ({ method, path }) => {
@@ -79,7 +56,7 @@ describe('Universal AI Adapter', () => {
     const tools = [
       'web-search', 'calculator', 'weather', 'translate',
       'files', 'code-runner', 'image-gen', 'datetime',
-      'url-fetch', 'json-parse'
+      'url-fetch', 'json-parse',
     ];
 
     test('should have 10 tools defined', () => {
@@ -93,10 +70,10 @@ describe('Universal AI Adapter', () => {
         parameters: {
           type: 'object',
           properties: {
-            param1: { type: 'string' }
+            param1: { type: 'string' },
           },
-          required: ['param1']
-        }
+          required: ['param1'],
+        },
       };
 
       expect(toolDefinition.name).toBeDefined();
@@ -110,7 +87,7 @@ describe('Universal AI Adapter', () => {
     test('should handle file uploads', () => {
       const mockFile = {
         name: 'test.txt',
-        content: 'Test content for knowledge base'
+        content: 'Test content for knowledge base',
       };
 
       expect(mockFile.name).toBeDefined();
@@ -120,7 +97,7 @@ describe('Universal AI Adapter', () => {
     test('should handle file queries', () => {
       const mockQuery = {
         query: 'test query',
-        topK: 3
+        topK: 3,
       };
 
       expect(mockQuery.query).toBeDefined();
@@ -137,7 +114,7 @@ describe('Universal AI Adapter', () => {
     const guardrailPatterns = [
       { pattern: /how to (make|build|create) (a )?bomb/i, response: "I can't help with that request." },
       { pattern: /(self-?harm|suicide|cut myself)/i, response: "I'm concerned about your wellbeing." },
-      { pattern: /give me (legal|lawyer)/i, response: "I'm not a lawyer and can't provide legal advice." }
+      { pattern: /give me (legal|lawyer)/i, response: "I'm not a lawyer and can't provide legal advice." },
     ];
 
     test('should have guardrail patterns', () => {
@@ -146,13 +123,13 @@ describe('Universal AI Adapter', () => {
 
     test('should block harmful requests', () => {
       const harmfulRequest = 'how to make a bomb';
-      const blocked = guardrailPatterns.some(g => g.pattern.test(harmfulRequest));
+      const blocked = guardrailPatterns.some((guard) => guard.pattern.test(harmfulRequest));
       expect(blocked).toBe(true);
     });
 
     test('should not block normal requests', () => {
       const normalRequest = 'how to make coffee';
-      const blocked = guardrailPatterns.some(g => g.pattern.test(normalRequest));
+      const blocked = guardrailPatterns.some((guard) => guard.pattern.test(normalRequest));
       expect(blocked).toBe(false);
     });
   });
@@ -164,10 +141,10 @@ describe('Universal AI Adapter', () => {
         'PROVIDER_UNAVAILABLE',
         'INVALID_REQUEST',
         'RATE_LIMIT_EXCEEDED',
-        'NETWORK_ERROR'
+        'NETWORK_ERROR',
       ];
 
-      errorTypes.forEach(errorType => {
+      errorTypes.forEach((errorType) => {
         expect(errorType).toBeDefined();
       });
     });
@@ -178,25 +155,24 @@ describe('Universal AI Adapter', () => {
         PROVIDER_UNAVAILABLE: 'The selected AI provider is currently unavailable. Please try another provider.',
         INVALID_REQUEST: 'Invalid request. Please check your input and try again.',
         RATE_LIMIT_EXCEEDED: 'Rate limit exceeded. Please wait a moment and try again.',
-        NETWORK_ERROR: 'Network error. Please check your connection and try again.'
+        NETWORK_ERROR: 'Network error. Please check your connection and try again.',
       };
 
-      Object.values(errorMessages).forEach(msg => {
-        expect(msg.length).toBeGreaterThan(10);
+      Object.values(errorMessages).forEach((message) => {
+        expect(message.length).toBeGreaterThan(10);
       });
     });
   });
 
   describe('Streaming', () => {
-    test('should support streaming for all providers', () => {
-      const streamingProviders = [
-        'ollama', 'localai', 'cerebras', 'openrouter',
-        'qwen', 'mistral', 'perplexity', 'minimax',
-        'zhipu', 'gemini', 'openai', 'anthropic', 'groq', 'deepseek'
-      ];
-      
-      // All 14 providers should support streaming
-      expect(streamingProviders.length).toBe(14);
+    test('should expose accurate streaming support metadata', () => {
+      const streamingProviders = UnifiedAIService.listProviders()
+        .filter((provider) => provider.supportsStreaming)
+        .map((provider) => provider.provider);
+
+      expect(streamingProviders).toContain('openai');
+      expect(streamingProviders).toContain('kimi');
+      expect(streamingProviders).not.toContain('gemini');
     });
 
     test('should handle stream chunks', () => {
@@ -204,7 +180,7 @@ describe('Universal AI Adapter', () => {
         content: 'Hello',
         done: false,
         provider: 'ollama',
-        model: 'llama3.2'
+        model: 'llama3.2',
       };
 
       expect(chunk.content).toBeDefined();
@@ -217,7 +193,7 @@ describe('Universal AI Adapter', () => {
     test('should support fallback configuration', () => {
       const config = {
         enableFallback: true,
-        fallbackOrder: ['ollama', 'cerebras', 'openrouter', 'qwen', 'groq']
+        fallbackOrder: ['ollama', 'cerebras', 'openrouter', 'qwen', 'kimi', 'groq'],
       };
 
       expect(config.enableFallback).toBe(true);
@@ -228,7 +204,7 @@ describe('Universal AI Adapter', () => {
       const cacheConfig = {
         enabled: true,
         ttl: 3600000,
-        maxSize: 100
+        maxSize: 100,
       };
 
       expect(cacheConfig.enabled).toBe(true);
@@ -240,7 +216,7 @@ describe('Universal AI Adapter', () => {
       const rateLimitConfig = {
         enabled: true,
         maxRequests: 100,
-        windowMs: 60000
+        windowMs: 60000,
       };
 
       expect(rateLimitConfig.enabled).toBe(true);

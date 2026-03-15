@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { readFileSync } from 'fs';
 import {
   AIProvider,
   ProviderStatus,
@@ -11,6 +12,10 @@ import {
 
 type ConfigurableProvider = Exclude<AIProvider, 'none'>;
 type CommandName = 'chat' | 'stream' | 'status' | 'models' | 'compare';
+
+const { version: packageVersion } = JSON.parse(
+  readFileSync(new URL('../../../package.json', import.meta.url), 'utf8'),
+) as { version: string };
 
 const args = process.argv.slice(2);
 const providerMetadata = UnifiedAIService.listProviders();
@@ -79,7 +84,7 @@ function createService(provider: ConfigurableProvider, modelArg?: string, apiKey
 }
 
 function renderUsage(): void {
-  writeStdout('Universal AI Adapter CLI v1.7.0');
+  writeStdout(`Universal AI Adapter CLI v${packageVersion}`);
   writeStdout();
   writeStdout('Usage:');
   writeStdout('  ai-adapter chat <provider> <message> [model] [apiKeyOrBaseUrl]');
@@ -87,6 +92,7 @@ function renderUsage(): void {
   writeStdout('  ai-adapter status [provider] [model] [apiKeyOrBaseUrl]');
   writeStdout('  ai-adapter models [provider]');
   writeStdout('  ai-adapter compare <message>');
+  writeStdout('  ai-adapter --version');
   writeStdout();
   writeStdout('Examples:');
   writeStdout('  ai-adapter chat ollama "Hello" llama3.2');
@@ -197,8 +203,13 @@ async function runCompare(message: string): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  if (args.length === 0) {
+  if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
     renderUsage();
+    return;
+  }
+
+  if (args[0] === '--version' || args[0] === '-v') {
+    writeStdout(packageVersion);
     return;
   }
 
