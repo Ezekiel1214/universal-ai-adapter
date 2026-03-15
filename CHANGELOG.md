@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.8] - 2026-03-15
+
+## What's Changed
+
+- fix(cli): sync metadata-driven help and version output (5d40904)
+
+**Full Changelog**: https://github.com/Ezekiel1214/universal-ai-adapter/compare/v1.7.7...v1.7.8
+
 ## [1.7.7] - 2026-03-15
 
 ## What's Changed
