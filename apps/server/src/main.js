@@ -214,6 +214,58 @@ function getService(provider, options = {}) {
   return services.get(key);
 }
 
+function getProxyTarget(provider, baseURL) {
+  if (baseURL) {
+    return baseURL;
+  }
+
+  if (provider === 'ollama') {
+    return 'http://localhost:11434';
+  }
+
+  if (provider === 'localai') {
+    return 'http://localhost:8080';
+  }
+
+  return '';
+}
+
+async function sendProxyChat({ provider, apiKey, baseURL, model, messages, temperature, maxTokens, proxyUrl, forwardedFor }) {
+  const targetBaseURL = getProxyTarget(provider, baseURL);
+  const proxyRes = await fetch(proxyUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Forwarded-For': forwardedFor || '',
+      'X-Proxy-Target': targetBaseURL,
+    },
+    body: JSON.stringify({
+      provider,
+      apiKey,
+      baseURL: targetBaseURL,
+      model,
+      messages,
+      temperature,
+      maxTokens,
+    }),
+  });
+
+  let data;
+  const contentType = proxyRes.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    data = await proxyRes.json();
+  } else {
+    const text = await proxyRes.text();
+    data = text ? { error: text } : {};
+  }
+
+  if (!proxyRes.ok) {
+    throw new Error(data.error || `Proxy request failed with status ${proxyRes.status}`);
+  }
+
+  return { ...data, vpnRouted: true };
+}
+
 app.post('/api/chat', async (req, res) => {
   const startedAt = Date.now();
 
@@ -260,32 +312,19 @@ app.post('/api/chat', async (req, res) => {
 
     if (vpnEnabled && proxyUrl) {
       try {
-        const targetProvider = validatedProvider === 'ollama'
-          ? 'http://localhost:11434'
-          : validatedProvider === 'localai'
-            ? 'http://localhost:8080'
-            : '';
-
-        const proxyRes = await fetch(proxyUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Forwarded-For': req.ip,
-            'X-Proxy-Target': targetProvider,
-          },
-          body: JSON.stringify({
-            provider: validatedProvider,
-            baseURL: targetProvider,
-            model,
-            messages: processedMessages,
-            temperature,
-            maxTokens,
-          }),
+        const data = await sendProxyChat({
+          provider: validatedProvider,
+          apiKey,
+          baseURL,
+          model,
+          messages: processedMessages,
+          temperature,
+          maxTokens,
+          proxyUrl,
+          forwardedFor: req.ip,
         });
-
-        const data = await proxyRes.json();
         trackMetrics(validatedProvider, data.usage, Date.now() - startedAt);
-        return res.json({ ...data, vpnRouted: true });
+        return res.json(data);
       } catch (proxyError) {
         const normalizedError = normalizeError(proxyError);
         logger('error', 'Proxy connection failed', { provider: validatedProvider, error: normalizedError.message });
@@ -601,7 +640,7 @@ app.get('/api/models', async (req, res) => {
 // Compare ALL providers - the unified API in action!
 app.post('/api/compare', async (req, res) => {
   try {
-    const { message, providers: requestedProviders, temperature, maxTokens, apiKeys } = req.body;
+    const { message, providers: requestedProviders, temperature, maxTokens, apiKeys, vpnEnabled, proxyUrl } = req.body;
     
     if (!message) {
       return res.status(400).json({ error: 'Message required' });
@@ -619,12 +658,26 @@ app.post('/api/compare', async (req, res) => {
         const startTime = Date.now();
         
         try {
-          const service = getService(provider, { apiKey: apiKeys?.[provider] });
-          const response = await service.chat({
-            messages: [{ role: 'user', content: message }],
-            temperature,
-            maxTokens
-          });
+          let response;
+
+          if (vpnEnabled && proxyUrl) {
+            response = await sendProxyChat({
+              provider,
+              apiKey: apiKeys?.[provider],
+              messages: [{ role: 'user', content: message }],
+              temperature,
+              maxTokens,
+              proxyUrl,
+              forwardedFor: req.ip,
+            });
+          } else {
+            const service = getService(provider, { apiKey: apiKeys?.[provider] });
+            response = await service.chat({
+              messages: [{ role: 'user', content: message }],
+              temperature,
+              maxTokens
+            });
+          }
 
           const duration = Date.now() - startTime;
           trackMetrics(provider, response.usage, duration);
@@ -635,7 +688,8 @@ app.post('/api/compare', async (req, res) => {
             content: response.content,
             model: response.model,
             duration,
-            usage: response.usage
+            usage: response.usage,
+            vpnRouted: Boolean(response.vpnRouted)
           };
         } catch (error) {
           const normalizedError = normalizeError(error);

@@ -205,6 +205,26 @@
       color: var(--text);
     }
 
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .toggle-row input {
+      margin: 0;
+      width: 16px;
+      height: 16px;
+    }
+
+    .helper {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     .workspace {
       display: grid;
       grid-template-rows: 1fr auto;
@@ -382,14 +402,27 @@
         </div>
 
         <div class="row">
-          <div class="section-title">Prompt Controls</div>
+          <div class="section-title">Response</div>
           <label for="systemPrompt">System Prompt</label>
           <textarea id="systemPrompt" rows="4" placeholder="You are a concise and practical assistant."></textarea>
           <label for="temperature">Temperature</label>
           <input id="temperature" type="number" min="0" max="2" step="0.1" value="0.7">
           <label for="maxTokens">Max Tokens</label>
           <input id="maxTokens" type="number" min="64" max="8192" step="64" value="1024">
-          <label><input id="useKnowledgeBase" type="checkbox"> Use knowledge base context</label>
+        </div>
+
+        <div class="row">
+          <div class="section-title">Context</div>
+          <label class="toggle-row"><input id="useKnowledgeBase" type="checkbox"> Use knowledge base context</label>
+          <div class="helper">Pull uploaded knowledge files into the assistant context for chat requests.</div>
+        </div>
+
+        <div class="row">
+          <div class="section-title">Network</div>
+          <label class="toggle-row"><input id="vpnEnabled" type="checkbox"> Route requests through VPN / proxy</label>
+          <label for="proxyUrl">Proxy URL</label>
+          <input id="proxyUrl" type="url" placeholder="https://proxy.example.com/chat">
+          <div class="helper">Applies to chat and compare requests when your proxy endpoint accepts the adapter payload.</div>
         </div>
 
         <div id="compareProvidersWrap" class="row" style="display:none;">
@@ -444,6 +477,8 @@
       temperature: document.getElementById('temperature'),
       maxTokens: document.getElementById('maxTokens'),
       useKnowledgeBase: document.getElementById('useKnowledgeBase'),
+      vpnEnabled: document.getElementById('vpnEnabled'),
+      proxyUrl: document.getElementById('proxyUrl'),
       compareProvidersWrap: document.getElementById('compareProvidersWrap'),
       compareProviders: document.getElementById('compareProviders'),
       feed: document.getElementById('feed'),
@@ -481,9 +516,14 @@
         });
       });
 
-      [els.apiKey, els.systemPrompt, els.temperature, els.maxTokens, els.useKnowledgeBase].forEach((input) => {
+      [els.apiKey, els.systemPrompt, els.temperature, els.maxTokens, els.useKnowledgeBase, els.proxyUrl].forEach((input) => {
         input.addEventListener('change', persistState);
         input.addEventListener('input', persistState);
+      });
+
+      els.vpnEnabled.addEventListener('change', () => {
+        syncNetworkControls();
+        persistState();
       });
     }
 
@@ -496,6 +536,9 @@
       els.temperature.value = saved.temperature || '0.7';
       els.maxTokens.value = saved.maxTokens || '1024';
       els.useKnowledgeBase.checked = Boolean(saved.useKnowledgeBase);
+      els.vpnEnabled.checked = Boolean(saved.vpnEnabled);
+      els.proxyUrl.value = saved.proxyUrl || '';
+      syncNetworkControls();
     }
 
     function persistState() {
@@ -508,6 +551,8 @@
         temperature: els.temperature.value,
         maxTokens: els.maxTokens.value,
         useKnowledgeBase: els.useKnowledgeBase.checked,
+        vpnEnabled: els.vpnEnabled.checked,
+        proxyUrl: els.proxyUrl.value,
         compareProviders: Array.from(state.compareProviders)
       };
       localStorage.setItem('uaa.web.state.v2', JSON.stringify(payload));
@@ -558,6 +603,15 @@
       els.compareProvidersWrap.style.display = mode === 'compare' ? 'grid' : 'none';
       persistState();
       renderEmpty();
+    }
+
+    function syncNetworkControls() {
+      const enabled = els.vpnEnabled.checked;
+      els.proxyUrl.disabled = !enabled;
+      els.proxyUrl.style.opacity = enabled ? '1' : '0.65';
+      if (!enabled) {
+        els.proxyUrl.blur();
+      }
     }
 
     async function pingHealth() {
@@ -631,6 +685,8 @@
             maxTokens: Number(els.maxTokens.value || 1024),
             systemPrompt: els.systemPrompt.value || undefined,
             useKnowledgeBase: els.useKnowledgeBase.checked,
+            vpnEnabled: els.vpnEnabled.checked,
+            proxyUrl: els.proxyUrl.value || undefined,
             messages: state.messages
           })
         });
@@ -670,7 +726,9 @@
             providers: selected,
             temperature: Number(els.temperature.value || 0.7),
             maxTokens: Number(els.maxTokens.value || 1024),
-            apiKeys: buildApiKeyMap(selected)
+            apiKeys: buildApiKeyMap(selected),
+            vpnEnabled: els.vpnEnabled.checked,
+            proxyUrl: els.proxyUrl.value || undefined
           })
         });
 
@@ -706,7 +764,7 @@
 
       els.feed.innerHTML = state.messages.map((msg) => {
         const role = msg.role === 'user' ? 'user' : 'assistant';
-        const label = msg.role === 'user' ? 'You' : `${els.provider.value} • ${els.model.value || 'default'}`;
+        const label = msg.role === 'user' ? 'You' : `${els.provider.value} - ${els.model.value || 'default'}`;
         return `
           <article class="bubble ${role}">
             <div class="meta">${escapeHtml(label)}</div>
